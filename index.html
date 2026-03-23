@@ -1,294 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ObsidianX • Vault</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
-
   <style>
-    :root {
-      --bg: #030304;
-      --card: #0a0a12;
-      --accent: #00ff9d;
-      --accent-dark: #00b36b;
-      --accent-glow: rgba(0,255,157,0.4);
-      --text: #e8f5ff;
-      --text-dim: #9ab7d1;
-      --glass: rgba(10,15,25,0.65);
-      --error: #ff4d6d;
-    }
-
-    * { margin:0; padding:0; box-sizing:border-box; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', system-ui, sans-serif;
-      min-height: 100vh;
-      padding: 1.5rem 1rem 90px;
-      background-image: 
-        radial-gradient(circle at 15% 30%, rgba(0,255,157,0.05) 0%, transparent 40%);
-      background-attachment: fixed;
-    }
-
-    canvas#particles { 
-      position: fixed; inset: 0; z-index: -1; pointer-events: none; 
-    }
-
-    h1 {
-      font-family: 'Orbitron', monospace;
-      font-size: clamp(2.8rem, 9vw, 4.8rem);
-      text-align: center;
-      background: linear-gradient(90deg, var(--accent), #00c8ff, var(--accent));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin: 0.6rem 0 1.2rem;
-      text-shadow: 0 0 30px var(--accent-glow);
-    }
-
-    .subtitle {
-      text-align: center;
-      color: var(--text-dim);
-      font-size: 1.1rem;
-      margin-bottom: 2rem;
-    }
-
-    #refreshBtn {
-      display: block;
-      margin: 0 auto 2.2rem;
-      padding: 0.9rem 2.2rem;
-      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-      color: #000;
-      font-weight: 600;
-      border: none;
-      border-radius: 12px;
-      font-size: 1.1rem;
-      cursor: pointer;
-      box-shadow: 0 4px 18px var(--accent-glow);
-      transition: all 0.25s;
-    }
-
-    #refreshBtn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px var(--accent-glow); }
-
-    .store {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.6rem;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    .card {
-      background: var(--glass);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(0,255,157,0.18);
-      border-radius: 16px;
-      overflow: hidden;
-      transition: all 0.35s ease;
-      box-shadow: 0 10px 35px rgba(0,0,0,0.55);
-    }
-
-    .card:hover {
-      transform: translateY(-12px);
-      box-shadow: 0 24px 55px rgba(0,255,157,0.3);
-      border-color: var(--accent);
-    }
-
-    .card img { width: 100%; height: 180px; object-fit: cover; }
-
-    .card-content { padding: 1.3rem; }
-
-    .card h3 { font-size: 1.35rem; margin-bottom: 0.6rem; color: white; }
-
-    .card p { color: var(--text-dim); font-size: 0.95rem; line-height: 1.45; }
-
-    .price { color: var(--accent); font-weight: 700; font-size: 1.25rem; margin: 0.8rem 0; display: block; }
-
-    .btn-buy {
-      width: 100%; padding: 0.9rem; background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-      color: #000; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;
-    }
-
-    #ownerFab {
-      position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px;
-      background: linear-gradient(145deg, var(--accent), var(--accent-dark));
-      color: #000; font-size: 2.1rem; border: none; border-radius: 20px;
-      box-shadow: 0 8px 35px var(--accent-glow); z-index: 9999; cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    #ownerFab:hover { transform: scale(1.12); }
-
-    #ownerPanel {
-      display: none; position: fixed; inset: 0; background: rgba(3,3,4,0.96);
-      backdrop-filter: blur(10px); z-index: 9998; align-items: center; justify-content: center;
-      padding: 1.5rem;
-    }
-
-    .panel {
-      background: var(--glass); backdrop-filter: blur(18px);
-      border: 1px solid rgba(0,255,157,0.22); border-radius: 20px;
-      padding: 2.2rem; width: 100%; max-width: 560px; position: relative;
-      box-shadow: 0 25px 70px rgba(0,0,0,0.8);
-    }
-
-    input[type="text"], input[type="password"], input[type="file"] {
-      width: 100%; padding: 0.9rem; margin: 0.7rem 0;
-      background: rgba(15,20,35,0.8); border: 1px solid rgba(0,255,157,0.3);
-      color: var(--text); border-radius: 10px; font-size: 1rem;
-    }
-
-    #errorMsg { color: var(--error); text-align: center; margin: 1rem 0; font-weight: 500; min-height: 1.3em; }
-
-    @media (max-width: 500px) {
-      #ownerFab { bottom: 20px; right: 20px; width: 64px; height: 64px; font-size: 1.9rem; }
-    }
+    body { background:#000; color:#0f0; font-family:Arial; text-align:center; padding:20px; margin:0; }
+    h1 { color:#0f0; font-size:2.8rem; margin:20px 0; }
+    .refresh-text { color:#555; margin:20px 0; font-size:1.1rem; }
+    .store { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; max-width:1200px; margin:0 auto; }
+    .card { background:#111; border:2px solid #0f0; border-radius:12px; padding:15px; position:relative; }
+    .card img { width:100%; height:180px; object-fit:cover; border-radius:8px; }
+    .status { position:absolute; top:10px; right:10px; background:orange; color:black; padding:4px 10px; border-radius:6px; font-size:0.9rem; display:none; }
+    button { padding:14px; font-size:1.1rem; margin:8px 0; border:none; border-radius:8px; cursor:pointer; width:100%; }
+    #ownerFab { position:fixed; bottom:30px; right:30px; width:80px; height:80px; background:#0f0; color:#000; font-size:2.8rem; border:none; border-radius:50%; box-shadow:0 0 25px #0f0; z-index:9999; }
+    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:9998; align-items:center; justify-content:center; padding:10px; }
+    .panel { background:#111; border:3px solid #0f0; border-radius:16px; padding:25px; width:100%; max-width:480px; max-height:85vh; overflow-y:auto; }
+    input, select { width:100%; padding:12px; margin:10px 0; background:#222; border:1px solid #0f0; color:#0f0; border-radius:8px; }
+    .step { color:#555; font-size:0.9rem; margin-bottom:10px; }
   </style>
 </head>
 <body>
 
-<canvas id="particles"></canvas>
-
-<h1>ObsidianX</h1>
-<p class="subtitle">exclusive brainrot drops • discord only • limited stock</p>
-
-<button id="refreshBtn">🔄 Refresh Vault</button>
+<h1>ObsidianX Vault</h1>
+<p class="refresh-text">Refresh this page to see if there any new brainrot in stock</p>
 
 <div class="store" id="cards"></div>
 
 <button id="ownerFab">👑</button>
 
-<!-- Owner Panel -->
-<div id="ownerPanel">
+<!-- Owner Panel (scrollable) -->
+<div id="ownerPanel" class="modal">
   <div class="panel">
-    <button onclick="closeOwner()" style="position:absolute;top:1.2rem;right:1.2rem;background:rgba(255,255,255,0.08);color:white;border:none;width:44px;height:44px;border-radius:50%;font-size:1.7rem;cursor:pointer;">×</button>
-
-    <h2 style="color:var(--accent);text-align:center;margin-bottom:1.8rem;">OWNER ZONE</h2>
-
-    <div id="loginSection">
-      <input id="pass" type="password" placeholder="Access key" autocomplete="off">
-      <button onclick="unlockOwner()" class="btn-buy" style="margin-top:1.2rem;">UNLOCK</button>
-      <div id="errorMsg"></div>
+    <button onclick="closeOwner()" style="float:right;background:red;color:white;border:none;padding:8px 16px;border-radius:50%;">×</button>
+    <h2 style="color:#0f0;">OWNER PANEL</h2>
+    <div id="loginPart">
+      <input id="pass" type="password" placeholder="Access key">
+      <button onclick="unlock()" style="background:#0f0;color:#000;">UNLOCK</button>
+      <div id="error" style="color:red;margin:10px 0;"></div>
     </div>
-
-    <div id="ownerInner" style="display:none;">
-      <h3 style="color:var(--accent);margin-bottom:1.2rem;">Create New Drop</h3>
-      <input id="nname" placeholder="Title / Name" required>
-      <input id="ndesc" placeholder="Description">
-      <input id="nprice" placeholder="Price (e.g. 399 Robux)" required>
-      <input id="robuxL" placeholder="Robux Gamepass Link">
-      <input id="visaL" placeholder="Visa Prepaid Gift Card Link">
-      <input type="file" id="photoPicker" accept="image/*" style="padding:0.8rem;background:rgba(15,20,35,0.9);border:1px dashed var(--accent);">
-
-      <button onclick="publishDrop()" class="btn-buy" style="margin-top:1.5rem;">PUBLISH DROP</button>
-
-      <div id="ownerList" style="margin-top:2.8rem; max-height:280px; overflow-y:auto;"></div>
+    <div id="mainPart" style="display:none;">
+      <input id="name" placeholder="Name" required>
+      <input id="desc" placeholder="Description">
+      <input id="price" placeholder="Price (e.g. 399 Robux)" required>
+      <input id="robuxLink" placeholder="Robux Gamepass Link">
+      <input id="visaLink" placeholder="Visa Prepaid Gift Card Link">
+      <input type="number" id="quantity" value="1" min="1">
+      <select id="rarity">
+        <option value="Common" style="color:#aaa">Common</option>
+        <option value="Uncommon" style="color:#0f0">Uncommon</option>
+        <option value="Rare" style="color:#00bfff">Rare</option>
+        <option value="Mythic" style="color:#c300ff">Mythic</option>
+        <option value="Secret" style="color:#ff1a1a">Secret</option>
+        <option value="OG" style="color:#ffd700">OG</option>
+      </select>
+      <input type="file" id="photo" accept="image/*">
+      <button onclick="publish()" id="publishBtn" style="background:#0f0;color:#000;margin-top:15px;">PUBLISH DROP</button>
     </div>
   </div>
 </div>
 
+<!-- Buy Steps (1/4 to 4/4) -->
+<div id="step1" class="modal"><div class="panel">
+  <div class="step">1/4</div>
+  <h2 id="buyTitle"></h2>
+  <button onclick="choosePay('robux')" style="background:#0f0;color:#000;">💎 Robux</button>
+  <button onclick="choosePay('visa')" style="background:#0f0;color:#000;">💳 Visa Prepaid</button>
+  <button onclick="closeModals()" style="background:#555;">Cancel</button>
+</div></div>
+
+<div id="step2" class="modal"><div class="panel">
+  <div class="step">2/4</div>
+  <h2>Pay Here</h2>
+  <p id="payLink"></p>
+  <button onclick="nextStep()" style="background:#0f0;color:#000;">I PURCHASED</button>
+</div></div>
+
+<div id="step3" class="modal"><div class="panel">
+  <div class="step">3/4</div>
+  <h2>Your Roblox Username</h2>
+  <input id="robloxUser" placeholder="Username">
+  <button onclick="nextStep()" style="background:#0f0;color:#000;">SUBMIT</button>
+</div></div>
+
+<div id="step4" class="modal"><div class="panel">
+  <div class="step">4/4</div>
+  <h2>Proof</h2>
+  <input id="proof" placeholder="Screenshot link or card details">
+  <button onclick="sendToOwner()" style="background:#0f0;color:#000;">SEND TO OWNER</button>
+</div></div>
+
 <script>
-// ─── Green Particles ───────────────────────────────────────────────
-const canvas = document.getElementById('particles');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+let currentId = null, currentType = '';
 
-let particles = [];
-class Particle {
-  constructor() { this.reset(); }
-  reset() {
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height;
-    this.size = Math.random() * 2.8 + 0.9;
-    this.speedX = (Math.random() - 0.5) * 0.4;
-    this.speedY = (Math.random() - 0.5) * 0.4;
-    this.alpha = Math.random() * 0.35 + 0.15;
-  }
-  update() {
-    this.x += this.speedX;
-    this.y += this.speedY;
-    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-  }
-  draw() {
-    ctx.globalAlpha = this.alpha;
-    ctx.fillStyle = '#00ff9d';
-    ctx.shadowBlur = 12;
-    ctx.shadowColor = '#00ff9d';
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
-    ctx.fill();
-    ctx.shadowBlur = 0;
-    ctx.globalAlpha = 1;
-  }
+// Owner
+document.getElementById('ownerFab').onclick = () => document.getElementById('ownerPanel').style.display = 'flex';
+function closeOwner() { document.getElementById('ownerPanel').style.display = 'none'; }
+function unlock() {
+  if (document.getElementById('pass').value === "favela23") {
+    document.getElementById('loginPart').style.display = 'none';
+    document.getElementById('mainPart').style.display = 'block';
+  } else document.getElementById('error').innerHTML = 'Wrong password';
 }
 
-for (let i = 0; i < 90; i++) particles.push(new Particle());
+// Publish with validation
+async function publish() {
+  const name = document.getElementById('name').value.trim();
+  const price = document.getElementById('price').value.trim();
+  if (!name || !price) return alert("Name and Price are required!");
 
-function animateParticles() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  particles.forEach(p => { p.update(); p.draw(); });
-  requestAnimationFrame(animateParticles);
-}
-animateParticles();
-
-window.addEventListener('resize', () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-});
-
-// ─── Refresh Animation ─────────────────────────────────────────────
-document.getElementById('refreshBtn').onclick = async function() {
-  const btn = this;
+  const btn = document.getElementById('publishBtn');
+  btn.textContent = 'Publishing...';
   btn.disabled = true;
-  btn.textContent = 'Refreshing... 1.';
-  await new Promise(r => setTimeout(r, 800));
-  btn.textContent = 'Refreshing... 2..';
-  await new Promise(r => setTimeout(r, 800));
-  btn.textContent = 'Refreshing... 3...';
-  await new Promise(r => setTimeout(r, 800));
-  btn.textContent = '🔄 Refresh Vault';
-  btn.disabled = false;
-  loadItems();
-};
 
-// ─── Shop Loading ──────────────────────────────────────────────────
+  const file = document.getElementById('photo').files[0];
+  let img = "https://picsum.photos/300";
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = () => sendPublish(reader.result);
+    reader.readAsDataURL(file);
+  } else sendPublish(img);
+}
+
+async function sendPublish(img) {
+  const body = {
+    name: document.getElementById('name').value,
+    desc: document.getElementById('desc').value,
+    price: document.getElementById('price').value,
+    robuxLink: document.getElementById('robuxLink').value,
+    visaLink: document.getElementById('visaLink').value,
+    quantity: parseInt(document.getElementById('quantity').value) || 1,
+    rarity: document.getElementById('rarity').value,
+    img
+  };
+  await fetch('/add-item', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+  alert('✅ Published! Returning to shop...');
+  closeOwner();
+  loadItems();
+}
+
+// Load shop
 async function loadItems() {
-  try {
-    const res = await fetch('/items');
-    const items = await res.json();
-    document.getElementById('cards').innerHTML = items.map(item => `
-      <div class="card">
-        <img src="${item.img || 'https://picsum.photos/300/200?random=' + item.id}" alt="${item.name}">
-        <div class="card-content">
-          <h3>${item.name}</h3>
-          <p>${item.desc || ''}</p>
-          <span class="price">${item.price}</span>
-          <button class="btn-buy">BUY NOW</button>
-        </div>
-      </div>
-    `).join('');
-  } catch (err) {
-    console.error('Failed to load items', err);
+  const res = await fetch('/items');
+  const data = await res.json();
+  document.getElementById('cards').innerHTML = data.map(i => `
+    <div class="card">
+      <img src="${i.img}">
+      <h3>${i.name} <small>(${i.quantity} left • ${i.rarity})</small></h3>
+      <p>${i.desc || ''} • ${i.price}</p>
+      <button onclick="startBuy(${i.id}, '${i.name}', '${i.robuxLink}', '${i.visaLink}')">BUY NOW</button>
+      <div class="status" id="hold${i.id}">IN ORDER</div>
+    </div>
+  `).join('');
+}
+
+function startBuy(id, name, robuxL, visaL) {
+  currentId = id;
+  document.getElementById(`hold${id}`).style.display = 'block';
+  document.getElementById('buyTitle').textContent = name;
+  document.getElementById('step1').style.display = 'flex';
+  window.robuxL = robuxL;
+  window.visaL = visaL;
+  fetch(`/hold/${id}`, {method:'POST'});
+}
+
+function choosePay(type) {
+  closeModals();
+  currentType = type;
+  document.getElementById('payLink').innerHTML = `Link: <a href="${type==='robux' ? window.robuxL : window.visaL}" target="_blank">${type==='robux' ? window.robuxL : window.visaL}</a>`;
+  document.getElementById('step2').style.display = 'flex';
+}
+
+function nextStep() {
+  closeModals();
+  if (document.getElementById('step2').style.display === 'flex') {
+    document.getElementById('step3').style.display = 'flex';
+  } else if (document.getElementById('step3').style.display === 'flex') {
+    document.getElementById('step4').style.display = 'flex';
   }
 }
 
-// ─── Owner Panel ───────────────────────────────────────────────────
-function openOwner() {
-  document.getElementById('ownerPanel').style.display = 'flex';
-  document.getElementById('pass').focus();
+function sendToOwner() {
+  const username = document.getElementById('robloxUser') ? document.getElementById('robloxUser').value : "Unknown";
+  const proof = document.getElementById('proof').value || "No proof";
+  alert(`📨 Sent to owner!\nBrainrot: ${document.getElementById('buyTitle').textContent}\nRoblox: ${username}\nProof: ${proof}\n\n(Discord bot will ping you with screenshot + username)`);
+  closeModals();
+  loadItems();
 }
 
-function closeOwner() {
-  document.getElementById('ownerPanel').style.display = 'none';
-  document.getElementById('pass').value = '';
-  document.getElementById('errorMsg').textContent = '';
+function closeModals() {
+  document.getElementById('step1').style.display = 'none';
+  document.getElementById('step2').style.display = 'none';
+  document.getElementById('step3').style.display = 'none';
+  document.getElementById('step4').style.display = 'none';
 }
 
-function unlockOwner() {
-  const input = document.getElement
+// Start
+loadItems();
+</script>
+</body>
+</html>
