@@ -1,261 +1,457 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>ObsidianX Store 🖤</title>
-<style>
-    body { 
-        background: #0b0b0b; 
-        color: #fff; 
-        font-family: Arial; 
-        text-align: center; 
-        margin:0; 
-        padding:20px 20px 80px 20px; 
-        min-height: 100vh;
-        position: relative;
-    }
-    h1 { font-size: 3rem; margin: 10px; }
-    .store { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; margin-top:20px; }
-    .card { 
-        background:#111; 
-        width:260px; 
-        border-radius:16px; 
-        overflow:hidden; 
-        transition:0.3s; 
-        box-shadow: 0 0 15px rgba(255,0,255,0.3); 
-    }
-    .card:hover { transform:scale(1.08); }
-    img { width:100%; height:160px; object-fit:cover; }
-    button { 
-        margin:5px; 
-        padding:12px; 
-        width:90%; 
-        background:#000; 
-        color:white; 
-        border:2px solid #ff00ff; 
-        cursor:pointer; 
-        border-radius:8px; 
-    }
-    .modal { 
-        display:none; 
-        position:fixed; 
-        top:50%; 
-        left:50%; 
-        transform:translate(-50%,-50%); 
-        background:#1a1a1a; 
-        padding:20px; 
-        border:3px solid #ff00ff; 
-        border-radius:12px; 
-        width:90%; 
-        max-width:400px; 
-        z-index: 1000;
-    }
-    input, select { 
-        width:100%; 
-        padding:10px; 
-        margin:8px 0; 
-        background:#222; 
-        color:white; 
-        border:1px solid #ff00ff; 
-        border-radius:6px;
-        box-sizing: border-box;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ObsidianX • Brainrot Vault</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --card: #111118;
+      --card-border: rgba(255,0,255,0.08);
+      --accent: #ff00d4;
+      --accent-glow: rgba(255,0,212,0.35);
+      --accent-dark: #c300a0;
+      --text: #e0e0ff;
+      --text-dim: #a0a0cc;
+      --cyan: #00f0ff;
+      --glass: rgba(20,20,35,0.45);
     }
 
-    /* Floating square Owner button in bottom-right */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 2rem 1rem 6rem;
+      background-image: 
+        radial-gradient(circle at 15% 50%, rgba(255,0,212,0.06) 0%, transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(0,240,255,0.04) 0%, transparent 35%);
+      background-attachment: fixed;
+    }
+
+    h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(2.5rem, 8vw, 4.2rem);
+      text-align: center;
+      margin-bottom: 0.6rem;
+      background: linear-gradient(90deg, #ff00d4, #00f0ff, #ff00d4);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: 2px;
+      text-shadow: 0 0 30px var(--accent-glow);
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 1.1rem;
+      margin-bottom: 2.5rem;
+      letter-spacing: 0.5px;
+    }
+
+    .store {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.6rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 0.5rem;
+    }
+
+    .card {
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      position: relative;
+    }
+
+    .card:hover {
+      transform: translateY(-12px) scale(1.03);
+      box-shadow: 0 24px 48px rgba(0,0,0,0.6), 0 0 40px var(--accent-glow);
+      border-color: var(--accent);
+    }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-content {
+      padding: 1.4rem 1.3rem;
+    }
+
+    .card h3 {
+      font-size: 1.35rem;
+      margin-bottom: 0.6rem;
+      color: white;
+      font-weight: 600;
+    }
+
+    .card p.desc {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      line-height: 1.45;
+      margin-bottom: 1rem;
+    }
+
+    .card .price {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--cyan);
+      margin-bottom: 1.1rem;
+      display: block;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 0.9rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px var(--accent-glow);
+    }
+
+    /* Floating owner button */
     #ownerFab {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 60px;
-        height: 60px;
-        background: #ff00ff;
-        color: black;
-        border: none;
-        border-radius: 16px;
-        font-size: 1.8rem;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 0 4px 15px rgba(255,0,255,0.5);
-        z-index: 999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: transform 0.2s;
-    }
-    #ownerFab:hover {
-        transform: scale(1.1);
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 68px;
+      height: 68px;
+      background: linear-gradient(135deg, #ff00d4, #c300a0);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      font-size: 1.9rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 8px 30px rgba(255,0,212,0.45);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
+    #ownerFab:hover {
+      transform: scale(1.15) rotate(8deg);
+      box-shadow: 0 16px 50px rgba(255,0,212,0.6);
+    }
+
+    /* Owner overlay */
     #ownerPanel {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.9);
-        z-index: 998;
-        overflow-y: auto;
-        padding: 20px;
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10,10,15,0.92);
+      backdrop-filter: blur(8px);
+      z-index: 9998;
+      padding: 2rem 1rem;
+      overflow-y: auto;
     }
+
     #ownerContent {
-        background: #111;
-        border-radius: 12px;
-        padding: 20px;
-        max-width: 500px;
-        margin: 0 auto;
+      background: var(--glass);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 540px;
+      margin: 0 auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
     }
+
+    #ownerContent h2 {
+      font-family: 'Orbitron', monospace;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
     .close-btn {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        background: #ff00ff;
-        color: black;
-        border: none;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        font-size: 1.5rem;
-        cursor: pointer;
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 1.6rem;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
     }
-</style>
+
+    .close-btn:hover {
+      background: rgba(255,0,212,0.25);
+    }
+
+    /* Modal */
+    #buyModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-content {
+      background: var(--glass);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 20px 70px rgba(0,0,0,0.8);
+    }
+
+    .modal-content h2 {
+      color: var(--cyan);
+      margin-bottom: 1.4rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.9rem 1.1rem;
+      margin: 0.7rem 0;
+      background: rgba(30,30,50,0.6);
+      border: 1px solid rgba(255,0,212,0.2);
+      border-radius: 10px;
+      color: white;
+      font-size: 1rem;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 1.5rem 0.8rem 7rem; }
+      #ownerFab { bottom: 18px; right: 18px; width: 62px; height: 62px; font-size: 1.7rem; }
+    }
+  </style>
 </head>
 <body>
 
-<h1>🖤 ObsidianX Store</h1>
-<p>Buy via Discord • Items added/removed live by owner</p>
+  <h1>ObsidianX</h1>
+  <div class="subtitle">premium brainrot • limited drops • discord only</div>
 
-<div id="shop">
-    <button onclick="location.reload()" style="background:#ff00ff;color:black;margin-bottom:30px;">🔄 Refresh Brainrots</button>
-    <div class="store" id="cards"></div>
-</div>
+  <div class="store" id="cards"></div>
 
-<!-- Floating Owner Button -->
-<button id="ownerFab" onclick="openOwnerPanel()">👑</button>
+  <!-- Floating owner access -->
+  <button id="ownerFab" title="Owner Panel">👑</button>
 
-<!-- Owner Panel (full-screen overlay) -->
-<div id="ownerPanel">
-    <button class="close-btn" onclick="closeOwnerPanel()">×</button>
+  <!-- Owner overlay -->
+  <div id="ownerPanel">
     <div id="ownerContent">
-        <h2>Owner Panel</h2>
-        <input id="pass" placeholder="Enter key" type="password">
-        <button onclick="checkPass()" style="width:100%; margin-top:15px;">Unlock</button>
+      <button class="close-btn" onclick="closeOwnerPanel()">×</button>
+      <h2>OWNER ZONE</h2>
 
-        <div id="ownerInner" style="display:none; margin-top:25px;">
-            <h3>Add New Brainrot</h3>
-            <input id="nname" placeholder="Name"><br>
-            <input id="ndesc" placeholder="Description"><br>
-            <input id="nimg" placeholder="Image URL (e.g. imgur or picsum)"><br>
-            <input id="nprice" placeholder="Price (e.g. 399 Robux)"><br>
-            <select id="ntype">
-                <option value="robux">Robux</option>
-                <option value="visa">Visa</option>
-            </select><br>
-            <button onclick="addItem()" style="background:#00ff9d;color:black;">📤 Upload Brainrot</button>
+      <input id="pass" type="password" placeholder="Access key" autocomplete="off"/>
+      <button class="btn" onclick="checkPass()" style="margin-top:1.2rem;">UNLOCK</button>
 
-            <h3 style="margin-top:30px;">Existing Brainrots</h3>
-            <div id="ownerList"></div>
-        </div>
+      <div id="ownerInner" style="display:none; margin-top:2rem;">
+        <h3 style="color:var(--cyan); margin-bottom:1rem;">Create New Drop</h3>
+
+        <input id="nname"    placeholder="Name" />
+        <input id="ndesc"    placeholder="Description" />
+        <input id="nimg"     placeholder="Image URL" />
+        <input id="nprice"   placeholder="Price (399 Robux / $19)" />
+        <select id="ntype">
+          <option value="robux">Robux</option>
+          <option value="visa">Visa</option>
+        </select>
+
+        <button class="btn" onclick="addItem()" style="margin-top:1.4rem; background:linear-gradient(135deg,#00f0ff,#00b7cc);">PUBLISH DROP</button>
+
+        <h3 style="color:var(--cyan); margin:2.5rem 0 1rem;">Current Vault</h3>
+        <div id="ownerList" style="display:flex; flex-direction:column; gap:0.9rem;"></div>
+      </div>
     </div>
-</div>
+  </div>
 
-<!-- Buy Modal -->
-<div id="buyModal" class="modal">
-    <h2 id="modalTitle"></h2>
-    <select id="payType">
-        <option value="robux">💎 Robux Gamepass</option>
-        <option value="visa">💳 Prepaid Visa</option>
-    </select>
-    <input id="purchaseLink" placeholder="Proof link / transaction ID">
-    <button onclick="simulateBuy()" style="background:#00ff9d;color:black;margin-top:15px;">✅ I Purchased – Send Proof</button>
-    <button onclick="closeModal()" style="margin-top:10px;">❌ Close</button>
-</div>
+  <!-- Purchase confirmation modal -->
+  <div id="buyModal">
+    <div class="modal-content">
+      <h2 id="modalTitle"></h2>
 
-<script>
-async function loadItems() {
-    try {
-        const res = await fetch("/items");
-        const data = await res.json();
-        const div = document.getElementById("cards");
-        div.innerHTML = "";
-        data.forEach(item => {
-            const c = document.createElement("div");
-            c.className = "card";
-            c.innerHTML = `
-                <img src="${item.img}">
-                <h3>${item.name}</h3>
-                <p>${item.desc || ''}</p>
-                <p><b>${item.price}</b></p>
-                <button onclick="buy(${item.id}, '${item.name.replace(/'/g, "\\'")}', '${item.type}')">🛒 Buy Now</button>
-            `;
-            div.appendChild(c);
+      <select id="payType">
+        <option value="robux">Pay with Robux Gamepass</option>
+        <option value="visa">Pay with Prepaid Visa</option>
+      </select>
+
+      <input id="purchaseLink" placeholder="Proof / Transaction link" />
+
+      <button class="btn" onclick="simulateBuy()" style="margin-top:1.3rem;">I PAID – SEND PROOF</button>
+      <button onclick="closeModal()" style="margin-top:0.8rem; background:rgba(255,255,255,0.08); color:var(--text-dim);">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    const PASS = "favela23";
+
+    async function loadItems() {
+      try {
+        const r = await fetch("/items");
+        const items = await r.json();
+        const container = document.getElementById("cards");
+        container.innerHTML = "";
+
+        items.forEach(item => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <img src="${item.img || 'https://picsum.photos/400/240?random=' + item.id}" alt="${item.name}">
+            <div class="card-content">
+              <h3>${item.name}</h3>
+              <p class="desc">${item.desc || ''}</p>
+              <span class="price">${item.price}</span>
+              <button class="btn" onclick="openBuyModal(${item.id}, '${item.name.replace(/'/g,"\\'")}', '${item.type}')">
+                CLAIM NOW
+              </button>
+            </div>
+          `;
+          container.appendChild(card);
         });
-        renderOwnerList(data);
-    } catch(e) {
-        console.error("Failed to load items", e);
+
+        renderOwnerList(items);
+      } catch (err) {
+        console.error("Load failed", err);
+      }
     }
-}
-loadItems();
 
-function buy(id, name, type) {
-    document.getElementById("modalTitle").textContent = "Buying: " + name;
-    document.getElementById("buyModal").style.display = "block";
-    window.currentBuyId = id;
-}
+    function openBuyModal(id, name, type) {
+      document.getElementById("modalTitle").textContent = `Purchase • ${name}`;
+      document.getElementById("buyModal").style.display = "flex";
+      window.currentBuy = { id, name, type };
+    }
 
-function closeModal() {
-    document.getElementById("buyModal").style.display = "none";
-}
+    function closeModal() {
+      document.getElementById("buyModal").style.display = "none";
+    }
 
-async function simulateBuy() {
-    const link = document.getElementById("purchaseLink").value.trim() || "(no link provided)";
-    alert(`Proof received!\n\nLink/ID: ${link}\n\n→ Send screenshot/proof in Discord ticket\n→ For Visa you'll get card details + SSN there`);
-    await fetch(`/confirm-buy/${window.currentBuyId}`, { method: "POST" });
-    alert("🎉 Purchase confirmed – item removed from store!");
-    closeModal();
-    loadItems();
-}
+    async function simulateBuy() {
+      const link = document.getElementById("purchaseLink").value.trim() || "(no proof provided)";
+      alert(`Proof registered.\n\n→ Send screenshot in Discord ticket\n→ Robux / Visa details will be delivered there`);
+      await fetch(`/confirm-buy/${window.currentBuy.id}`, { method: "POST" });
+      alert("Drop sold & vault updated.");
+      closeModal();
+      loadItems();
+    }
 
-function openOwnerPanel() {
-    document.getElementById("ownerPanel").style.display = "block";
-    document.getElementById("pass").focus();
-}
+    function openOwnerPanel() {
+      document.getElementById("ownerPanel").style.display = "block";
+      document.getElementById("pass").focus();
+    }
 
-function closeOwnerPanel() {
-    document.getElementById("ownerPanel").style.display = "none";
-    // Reset fields
-    document.getElementById("pass").value = "";
-    document.getElementById("ownerInner").style.display = "none";
-}
+    function closeOwnerPanel() {
+      document.getElementById("ownerPanel").style.display = "none";
+      document.getElementById("pass").value = "";
+      document.getElementById("ownerInner").style.display = "none";
+    }
 
-function checkPass() {
-    if (document.getElementById("pass").value === "favela23") {
+    function checkPass() {
+      if (document.getElementById("pass").value === PASS) {
         document.getElementById("ownerInner").style.display = "block";
-    } else {
-        alert("Access denied");
+      } else {
+        alert("Access denied.");
+      }
     }
-}
 
-async function addItem() {
-    const name = document.getElementById("nname").value.trim();
-    const price = document.getElementById("nprice").value.trim();
-    if (!name || !price) {
-        alert("Name and price are required");
+    async function addItem() {
+      const name  = document.getElementById("nname").value.trim();
+      const price = document.getElementById("nprice").value.trim();
+
+      if (!name || !price) {
+        alert("Name & price required.");
         return;
-    }
+      }
 
-    const body = {
-        name: name,
+      const payload = {
+        name,
         desc: document.getElementById("ndesc").value.trim(),
-        img: document.getElementById("nimg").value.trim() || "https://picsum.photos/300/200",
-        price: price,
+        img:  document.getElementById("nimg").value.trim()  || `https://picsum.photos/400/240?random=${Date.now()}`,
+        price,
         type: document.getElementById("ntype").value
-    };
+      };
 
-    await fetch("/add-item", {
+      await fetch("/add-item", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(body)
-    });
+        body: JSON.stringify(payload)
+      });
 
-    alert("Brainrot added!");
+      alert("New brainrot published.");
+      loadItems();
+
+      // clear form
+      ["nname","ndesc","nimg","nprice"].forEach(id => document.getElementById(id).value = "");
+    }
+
+    function renderOwnerList(items) {
+      const list = document.getElementById("ownerList");
+      list.innerHTML = "";
+
+      items.forEach(item => {
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:0.9rem 1.1rem; background:rgba(30,30,50,0.4); border-radius:10px; border:1px solid rgba(255,0,212,0.1);";
+        row.innerHTML = `
+          <div>
+            <strong style="color:white;">${item.name}</strong><br>
+            <small style="color:var(--text-dim);">${item.price} • ${item.type}</small>
+          </div>
+          <button onclick="deleteItem(${item.id})" style="background:none; border:none; color:#ff3366; font-size:1.4rem; cursor:pointer;">×</button>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    async function deleteItem(id) {
+      if (!confirm("Permanently delete this drop?")) return;
+      await fetch(`/delete/${id}`, { method: "DELETE" });
+      loadItems();
+    }
+
+    // init
     loadItems();
-    // Optional: clear fields
-    document.getElementById("nname").value = "";
-    document.getElementBy
+    setInterval(loadItems, 45000); // soft refresh every ~45s
+  </script>
+</body>
+</html>
