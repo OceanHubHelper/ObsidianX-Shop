@@ -3,72 +3,193 @@
 <head>
 <title>ObsidianX Store 🖤</title>
 <style>
-    body { background: #0b0b0b; color: #fff; font-family: Arial; text-align: center; margin:0; padding:20px; }
+    body { 
+        background: #0b0b0b; 
+        color: #fff; 
+        font-family: Arial; 
+        text-align: center; 
+        margin:0; 
+        padding:20px 20px 80px 20px; 
+        min-height: 100vh;
+        position: relative;
+    }
     h1 { font-size: 3rem; margin: 10px; }
-    .tab { padding: 10px 20px; background:#222; display:inline-block; margin:10px; cursor:pointer; border-radius:8px; }
-    .tab.active { background:#ff00ff; color:black; }
     .store { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; margin-top:20px; }
-    .card { background:#111; width:260px; border-radius:16px; overflow:hidden; transition:0.3s; box-shadow: 0 0 15px rgba(255,0,255,0.3); }
+    .card { 
+        background:#111; 
+        width:260px; 
+        border-radius:16px; 
+        overflow:hidden; 
+        transition:0.3s; 
+        box-shadow: 0 0 15px rgba(255,0,255,0.3); 
+    }
     .card:hover { transform:scale(1.08); }
     img { width:100%; height:160px; object-fit:cover; }
-    button { margin:5px; padding:12px; width:90%; background:#000; color:white; border:2px solid #ff00ff; cursor:pointer; border-radius:8px; }
-    .modal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#1a1a1a; padding:20px; border:3px solid #ff00ff; border-radius:12px; width:90%; max-width:400px; }
-    input, select { width:100%; padding:10px; margin:8px 0; background:#222; color:white; border:1px solid #ff00ff; }
+    button { 
+        margin:5px; 
+        padding:12px; 
+        width:90%; 
+        background:#000; 
+        color:white; 
+        border:2px solid #ff00ff; 
+        cursor:pointer; 
+        border-radius:8px; 
+    }
+    .modal { 
+        display:none; 
+        position:fixed; 
+        top:50%; 
+        left:50%; 
+        transform:translate(-50%,-50%); 
+        background:#1a1a1a; 
+        padding:20px; 
+        border:3px solid #ff00ff; 
+        border-radius:12px; 
+        width:90%; 
+        max-width:400px; 
+        z-index: 1000;
+    }
+    input, select { 
+        width:100%; 
+        padding:10px; 
+        margin:8px 0; 
+        background:#222; 
+        color:white; 
+        border:1px solid #ff00ff; 
+        border-radius:6px;
+        box-sizing: border-box;
+    }
+
+    /* Floating square Owner button in bottom-right */
+    #ownerFab {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        background: #ff00ff;
+        color: black;
+        border: none;
+        border-radius: 16px;
+        font-size: 1.8rem;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(255,0,255,0.5);
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s;
+    }
+    #ownerFab:hover {
+        transform: scale(1.1);
+    }
+
+    #ownerPanel {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.9);
+        z-index: 998;
+        overflow-y: auto;
+        padding: 20px;
+    }
+    #ownerContent {
+        background: #111;
+        border-radius: 12px;
+        padding: 20px;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    .close-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #ff00ff;
+        color: black;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
 </style>
 </head>
 <body>
 
 <h1>🖤 ObsidianX Store</h1>
-<p>Buy via Discord • Owner adds/deletes live • Data saved forever</p>
-
-<div style="margin:15px;">
-    <span class="tab active" onclick="showTab(0)">🛒 Shop</span>
-    <span class="tab" onclick="showTab(1)">👑 Owner Panel</span>
-</div>
+<p>Buy via Discord • Items added/removed live by owner</p>
 
 <div id="shop">
-    <button onclick="location.reload()" style="background:#ff00ff;color:black;">🔄 Refresh</button>
+    <button onclick="location.reload()" style="background:#ff00ff;color:black;margin-bottom:30px;">🔄 Refresh Brainrots</button>
     <div class="store" id="cards"></div>
 </div>
 
-<div id="owner" style="display:none;">
-    <h2>👑 Owner Panel — type "obsidian"</h2>
-    <input id="pass" placeholder="Password" type="password">
-    <button onclick="checkPass()">Unlock</button>
-    <div id="ownerContent" style="display:none;">
-        <h3>Add New Brainrot</h3>
-        <input id="nname" placeholder="Name"><br>
-        <input id="ndesc" placeholder="Description"><br>
-        <input id="nimg" placeholder="Image URL"><br>
-        <input id="nprice" placeholder="Price"><br>
-        <select id="ntype"><option value="robux">Robux</option><option value="visa">Visa</option></select><br>
-        <button onclick="addItem()">📤 Upload</button>
+<!-- Floating Owner Button -->
+<button id="ownerFab" onclick="openOwnerPanel()">👑</button>
 
-        <h3>Existing (tap ❌ to delete)</h3>
-        <div id="ownerList"></div>
+<!-- Owner Panel (full-screen overlay) -->
+<div id="ownerPanel">
+    <button class="close-btn" onclick="closeOwnerPanel()">×</button>
+    <div id="ownerContent">
+        <h2>Owner Panel</h2>
+        <input id="pass" placeholder="Enter key" type="password">
+        <button onclick="checkPass()" style="width:100%; margin-top:15px;">Unlock</button>
+
+        <div id="ownerInner" style="display:none; margin-top:25px;">
+            <h3>Add New Brainrot</h3>
+            <input id="nname" placeholder="Name"><br>
+            <input id="ndesc" placeholder="Description"><br>
+            <input id="nimg" placeholder="Image URL (e.g. imgur or picsum)"><br>
+            <input id="nprice" placeholder="Price (e.g. 399 Robux)"><br>
+            <select id="ntype">
+                <option value="robux">Robux</option>
+                <option value="visa">Visa</option>
+            </select><br>
+            <button onclick="addItem()" style="background:#00ff9d;color:black;">📤 Upload Brainrot</button>
+
+            <h3 style="margin-top:30px;">Existing Brainrots</h3>
+            <div id="ownerList"></div>
+        </div>
     </div>
 </div>
 
+<!-- Buy Modal -->
 <div id="buyModal" class="modal">
     <h2 id="modalTitle"></h2>
-    <select id="payType"><option value="robux">💎 Robux</option><option value="visa">💳 Visa</option></select>
-    <input id="purchaseLink" placeholder="Your purchase proof link">
-    <button onclick="simulateBuy()">✅ I Purchased • Send Proof</button>
-    <button onclick="closeModal()">❌ Close</button>
+    <select id="payType">
+        <option value="robux">💎 Robux Gamepass</option>
+        <option value="visa">💳 Prepaid Visa</option>
+    </select>
+    <input id="purchaseLink" placeholder="Proof link / transaction ID">
+    <button onclick="simulateBuy()" style="background:#00ff9d;color:black;margin-top:15px;">✅ I Purchased – Send Proof</button>
+    <button onclick="closeModal()" style="margin-top:10px;">❌ Close</button>
 </div>
 
 <script>
 async function loadItems() {
-    const res = await fetch("/items");
-    const data = await res.json();
-    const div = document.getElementById("cards"); div.innerHTML = "";
-    data.forEach(item => {
-        const c = document.createElement("div"); c.className = "card";
-        c.innerHTML = `<img src="${item.img}"><h3>${item.name}</h3><p>${item.desc}</p><p><b>${item.price}</b></p>
-                       <button onclick="buy(${item.id}, '${item.name}', '${item.type}')">🛒 Buy</button>`;
-        div.appendChild(c);
-    });
-    renderOwnerList(data);
+    try {
+        const res = await fetch("/items");
+        const data = await res.json();
+        const div = document.getElementById("cards");
+        div.innerHTML = "";
+        data.forEach(item => {
+            const c = document.createElement("div");
+            c.className = "card";
+            c.innerHTML = `
+                <img src="${item.img}">
+                <h3>${item.name}</h3>
+                <p>${item.desc || ''}</p>
+                <p><b>${item.price}</b></p>
+                <button onclick="buy(${item.id}, '${item.name.replace(/'/g, "\\'")}', '${item.type}')">🛒 Buy Now</button>
+            `;
+            div.appendChild(c);
+        });
+        renderOwnerList(data);
+    } catch(e) {
+        console.error("Failed to load items", e);
+    }
 }
 loadItems();
 
@@ -78,49 +199,63 @@ function buy(id, name, type) {
     window.currentBuyId = id;
 }
 
-function simulateBuy() {
-    alert("📸 Proof received! Discord ticket will get code/SSN/Gamepass ✅");
-    fetch(`/confirm-buy/${window.currentBuyId}`, { method: "POST" }).then(() => {
-        alert("🎉 Brainrot sold & REMOVED forever!");
-        closeModal(); loadItems();
-    });
+function closeModal() {
+    document.getElementById("buyModal").style.display = "none";
 }
-function closeModal() { document.getElementById("buyModal").style.display = "none"; }
 
-function showTab(n) {
-    document.getElementById("shop").style.display = n===0 ? "block" : "none";
-    document.getElementById("owner").style.display = n===1 ? "block" : "none";
+async function simulateBuy() {
+    const link = document.getElementById("purchaseLink").value.trim() || "(no link provided)";
+    alert(`Proof received!\n\nLink/ID: ${link}\n\n→ Send screenshot/proof in Discord ticket\n→ For Visa you'll get card details + SSN there`);
+    await fetch(`/confirm-buy/${window.currentBuyId}`, { method: "POST" });
+    alert("🎉 Purchase confirmed – item removed from store!");
+    closeModal();
+    loadItems();
+}
+
+function openOwnerPanel() {
+    document.getElementById("ownerPanel").style.display = "block";
+    document.getElementById("pass").focus();
+}
+
+function closeOwnerPanel() {
+    document.getElementById("ownerPanel").style.display = "none";
+    // Reset fields
+    document.getElementById("pass").value = "";
+    document.getElementById("ownerInner").style.display = "none";
 }
 
 function checkPass() {
-    if (document.getElementById("pass").value === "obsidian") document.getElementById("ownerContent").style.display = "block";
-    else alert("Wrong");
+    if (document.getElementById("pass").value === "favela23") {
+        document.getElementById("ownerInner").style.display = "block";
+    } else {
+        alert("Access denied");
+    }
 }
 
 async function addItem() {
-    const body = { name: document.getElementById("nname").value || "New", desc: document.getElementById("ndesc").value,
-                   img: document.getElementById("nimg").value, price: document.getElementById("nprice").value,
-                   type: document.getElementById("ntype").value };
-    await fetch("/add-item", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
-    alert("📤 Added!"); loadItems();
-}
+    const name = document.getElementById("nname").value.trim();
+    const price = document.getElementById("nprice").value.trim();
+    if (!name || !price) {
+        alert("Name and price are required");
+        return;
+    }
 
-function renderOwnerList(data) {
-    const div = document.getElementById("ownerList"); div.innerHTML = "";
-    data.forEach(i => {
-        const d = document.createElement("div");
-        d.innerHTML = `${i.name} <button onclick="deleteItem(${i.id})" style="color:red">❌</button>`;
-        div.appendChild(d);
+    const body = {
+        name: name,
+        desc: document.getElementById("ndesc").value.trim(),
+        img: document.getElementById("nimg").value.trim() || "https://picsum.photos/300/200",
+        price: price,
+        type: document.getElementById("ntype").value
+    };
+
+    await fetch("/add-item", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(body)
     });
-}
 
-async function deleteItem(id) {
-    await fetch(`/delete/${id}`, {method:"DELETE"});
-    alert("🗑️ Deleted"); loadItems();
-}
-
-setTimeout(loadItems, 500);
-</script>
-<p style="margin-top:50px;opacity:0.6;">Final version • Push & deploy • Works forever on Railway</p>
-</body>
-</html>
+    alert("Brainrot added!");
+    loadItems();
+    // Optional: clear fields
+    document.getElementById("nname").value = "";
+    document.getElementBy
