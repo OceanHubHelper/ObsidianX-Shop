@@ -21,26 +21,14 @@ db.serialize(() => {
   )`);
 });
 
-app.get("/items", (req, res) => {
-  db.all("SELECT * FROM items", [], (err, rows) => res.json(rows || []));
-});
-
+app.get("/items", (req, res) => db.all("SELECT * FROM items", [], (_, rows) => res.json(rows || [])));
 app.post("/add-item", (req, res) => {
   const { name, desc, img, price, robuxLink, visaLink, quantity, rarity } = req.body;
-  db.run(`INSERT INTO items (name, desc, img, price, robuxLink, visaLink, quantity, rarity) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+  db.run("INSERT INTO items (name, desc, img, price, robuxLink, visaLink, quantity, rarity) VALUES (?,?,?,?,?,?,?,?)",
     [name, desc, img, price, robuxLink, visaLink, quantity || 1, rarity || 'Common'],
-    () => res.json({ success: true })
-  );
+    () => res.json({success: true}));
 });
+app.post("/hold/:id", (req, res) => db.run("UPDATE items SET quantity = quantity - 1 WHERE id = ?", req.params.id, () => res.json({success: true})));
+app.post("/complete/:id", (req, res) => db.run("DELETE FROM items WHERE id = ?", req.params.id, () => res.json({success: true})));
 
-app.post("/hold/:id", (req, res) => {
-  db.run("UPDATE items SET quantity = quantity - 1 WHERE id = ?", req.params.id);
-  res.json({ success: true });
-});
-
-app.post("/complete/:id", (req, res) => {
-  db.run("DELETE FROM items WHERE id = ?", req.params.id);
-  res.json({ success: true });
-});
-
-app.listen(process.env.PORT || 3000, () => console.log("✅ Ready"));
+app.listen(process.env.PORT || 3000, () => console.log("✅ Running"));
