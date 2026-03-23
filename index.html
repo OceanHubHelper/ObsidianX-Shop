@@ -3,145 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ObsidianX • Brainrot Vault</title>
+  <title>ObsidianX Shop</title>
   <style>
-    :root {
-      --bg: #000;
-      --card: #111;
-      --accent: #0f0;
-      --text: #0f0;
-      --dim: #555;
-      --error: #f00;
-    }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      min-height: 100vh;
-      position: relative;
-    }
-    canvas#particles {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-    }
-    h1 {
-      color: var(--accent);
-      text-align: center;
-      margin: 20px 0;
-      font-size: 2.8rem;
-    }
-    .refresh-text {
-      color: var(--dim);
-      text-align: center;
-      margin: 20px 0;
-      font-size: 1.1rem;
-    }
-    .store {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .card {
-      background: var(--card);
-      border: 2px solid var(--accent);
-      border-radius: 12px;
-      padding: 15px;
-      position: relative;
-    }
-    .card img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-    .status {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: orange;
-      color: black;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      display: none;
-    }
-    button {
-      padding: 14px;
-      font-size: 1.1rem;
-      margin: 8px 0;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      width: 100%;
-    }
-    #ownerFab {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      width: 80px;
-      height: 80px;
-      background: var(--accent);
-      color: #000;
-      font-size: 2.8rem;
-      border: none;
-      border-radius: 50%;
-      box-shadow: 0 0 25px var(--accent);
-      z-index: 9999;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.95);
-      z-index: 9998;
-      align-items: center;
-      justify-content: center;
-      padding: 10px;
-    }
-    .panel {
-      background: #111;
-      border: 3px solid var(--accent);
-      border-radius: 16px;
-      padding: 25px;
-      width: 100%;
-      max-width: 480px;
-      max-height: 88vh;
-      overflow-y: auto;
-    }
-    input, select {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      background: #222;
-      border: 1px solid var(--accent);
-      color: var(--text);
-      border-radius: 8px;
-    }
-    #statusMsg {
-      color: #ff0;
-      margin: 10px 0;
-      font-weight: bold;
-      min-height: 24px;
-    }
-    .step {
-      color: #555;
-      font-size: 0.9rem;
-      margin-bottom: 10px;
-    }
+    body { background:#000; color:#0f0; font-family:Arial; text-align:center; padding:20px; margin:0; }
+    h1 { color:#0f0; font-size:2.5rem; margin:20px 0; }
+    .store { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:15px; max-width:1000px; margin:0 auto; }
+    .card { background:#111; border:2px solid #0f0; border-radius:10px; padding:12px; position:relative; }
+    .card img { width:100%; height:160px; object-fit:cover; border-radius:8px; }
+    button { padding:12px; font-size:1rem; margin:6px 0; border:none; border-radius:8px; cursor:pointer; width:100%; }
+    #ownerFab { position:fixed; bottom:25px; right:25px; width:70px; height:70px; background:#0f0; color:#000; font-size:2.5rem; border:none; border-radius:50%; box-shadow:0 0 20px #0f0; z-index:9999; }
+    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9998; align-items:center; justify-content:center; padding:10px; }
+    .panel { background:#111; border:3px solid #0f0; border-radius:12px; padding:20px; width:100%; max-width:420px; max-height:85vh; overflow-y:auto; }
+    input, select { width:100%; padding:10px; margin:8px 0; background:#222; border:1px solid #0f0; color:#0f0; border-radius:6px; }
+    .status { position:absolute; top:8px; right:8px; background:orange; color:black; padding:4px 8px; border-radius:4px; font-size:0.8rem; display:none; }
+    .step { color:#555; font-size:0.9rem; margin-bottom:8px; }
   </style>
 </head>
 <body>
 
-<canvas id="particles"></canvas>
-
-<h1>ObsidianX Vault</h1>
-<p class="refresh-text">Refresh this page to see if there any new brainrot in stock</p>
+<h1>ObsidianX Shop</h1>
+<p class="refresh-text">Pull down to refresh and see new brainrots</p>
 
 <div class="store" id="cards"></div>
 
@@ -150,88 +31,67 @@
 <!-- Owner Panel -->
 <div id="ownerPanel" class="modal">
   <div class="panel">
-    <button onclick="closeOwner()" style="float:right;background:red;color:white;border:none;padding:8px 16px;border-radius:50%;">×</button>
-    <h2 style="color:#0f0;">OWNER PANEL</h2>
+    <button onclick="closeOwner()" style="float:right;background:red;color:white;border:none;padding:6px 12px;border-radius:50%;">×</button>
+    <h2 style="color:#0f0;">Owner Area</h2>
     <div id="loginPart">
-      <input id="pass" type="password" placeholder="Access key">
-      <button onclick="unlock()" style="background:#0f0;color:#000;">UNLOCK</button>
-      <div id="error" style="color:#f00;margin:10px 0;"></div>
+      <input id="pass" type="password" placeholder="Key">
+      <button onclick="unlock()" style="background:#0f0;color:#000;">Open</button>
+      <div id="error" style="color:red;margin:8px 0;"></div>
     </div>
     <div id="mainPart" style="display:none;">
       <input id="name" placeholder="Name" required>
       <input id="desc" placeholder="Description">
       <input id="price" placeholder="Price (e.g. 399 Robux)" required>
-      <input id="robuxLink" placeholder="Robux Gamepass Link">
-      <input id="visaLink" placeholder="Visa Prepaid Gift Card Link">
+      <input id="robuxLink" placeholder="Robux Link">
+      <input id="visaLink" placeholder="Visa Link">
       <input type="number" id="quantity" value="1" min="1">
       <select id="rarity">
-        <option value="Common" style="color:#aaa">Common</option>
-        <option value="Uncommon" style="color:#0f0">Uncommon</option>
-        <option value="Rare" style="color:#00bfff">Rare</option>
-        <option value="Mythic" style="color:#c300ff">Mythic</option>
-        <option value="Secret" style="color:#ff1a1a">Secret</option>
-        <option value="OG" style="color:#ffd700">OG</option>
+        <option value="Common">Common</option>
+        <option value="Uncommon">Uncommon</option>
+        <option value="Rare">Rare</option>
+        <option value="Mythic">Mythic</option>
+        <option value="Secret">Secret</option>
+        <option value="OG">OG</option>
       </select>
       <input type="file" id="photo" accept="image/*">
-      <button onclick="publish()" id="publishBtn" style="background:#0f0;color:#000;margin-top:15px;">PUBLISH DROP</button>
-      <div id="statusMsg"></div>
+      <button onclick="publish()" id="publishBtn" style="background:#0f0;color:#000;margin-top:12px;">Add Brainrot</button>
+      <div id="statusMsg" style="color:#ff0;margin-top:10px;"></div>
     </div>
   </div>
 </div>
 
-<!-- Buy Flow -->
-<div id="step1" class="modal">
-  <div class="panel">
-    <div class="step">1/4</div>
-    <h2 id="buyTitle"></h2>
-    <button onclick="choosePay('robux')" style="background:#0f0;color:#000;">💎 Robux</button>
-    <button onclick="choosePay('visa')" style="background:#0f0;color:#000;">💳 Visa Prepaid</button>
-    <button onclick="closeModals()" style="background:#555;">Cancel</button>
-  </div>
-</div>
+<!-- Buy Steps -->
+<div id="step1" class="modal"><div class="panel">
+  <div class="step">1/4</div>
+  <h2 id="buyTitle"></h2>
+  <button onclick="choosePay('robux')" style="background:#0f0;color:#000;">Robux</button>
+  <button onclick="choosePay('visa')" style="background:#0f0;color:#000;">Visa Prepaid</button>
+  <button onclick="closeModals()" style="background:#555;">Cancel</button>
+</div></div>
 
-<div id="step2" class="modal">
-  <div class="panel">
-    <div class="step">2/4</div>
-    <h2>Payment Link</h2>
-    <p id="payLink"></p>
-    <button onclick="nextStep()" style="background:#0f0;color:#000;">I PURCHASED</button>
-  </div>
-</div>
+<div id="step2" class="modal"><div class="panel">
+  <div class="step">2/4</div>
+  <h2>Pay Here</h2>
+  <p id="payLink"></p>
+  <button onclick="nextStep()" style="background:#0f0;color:#000;">I Bought It</button>
+</div></div>
 
-<div id="step3" class="modal">
-  <div class="panel">
-    <div class="step">3/4</div>
-    <h2>Roblox Username</h2>
-    <input id="robloxUser" placeholder="Your Roblox Username">
-    <button onclick="nextStep()" style="background:#0f0;color:#000;">SUBMIT</button>
-  </div>
-</div>
+<div id="step3" class="modal"><div class="panel">
+  <div class="step">3/4</div>
+  <h2>Your Roblox Username</h2>
+  <input id="robloxUser" placeholder="Username">
+  <button onclick="nextStep()" style="background:#0f0;color:#000;">Submit</button>
+</div></div>
 
-<div id="step4" class="modal">
-  <div class="panel">
-    <div class="step">4/4</div>
-    <h2>Proof</h2>
-    <input id="proof" placeholder="Screenshot link / card details">
-    <button onclick="sendToOwner()" style="background:#0f0;color:#000;">SEND TO OWNER</button>
-  </div>
-</div>
+<div id="step4" class="modal"><div class="panel">
+  <div class="step">4/4</div>
+  <h2>Proof</h2>
+  <input id="proof" placeholder="Screenshot link">
+  <button onclick="sendToOwner()" style="background:#0f0;color:#000;">Send to Owner</button>
+</div></div>
 
 <script>
-// Green particles
-const canvas = document.getElementById('particles');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-let particles = [];
-class Particle {
-  constructor() { this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height; this.size = Math.random()*3+1; this.speedX = (Math.random()-0.5)*0.8; this.speedY = (Math.random()-0.5)*0.8; }
-  update() { this.x += this.speedX; this.y += this.speedY; if (this.x < 0 || this.x > canvas.width) this.speedX *= -1; if (this.y < 0 || this.y > canvas.height) this.speedY *= -1; }
-  draw() { ctx.fillStyle = '#0f0'; ctx.fillRect(this.x,this.y,this.size,this.size); }
-}
-for(let i=0;i<80;i++) particles.push(new Particle());
-function animate() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{p.update();p.draw();}); requestAnimationFrame(animate); }
-animate();
+let currentId = null, currentType = '';
 
 // Owner panel
 document.getElementById('ownerFab').onclick = () => document.getElementById('ownerPanel').style.display = 'flex';
@@ -241,32 +101,31 @@ function unlock() {
     document.getElementById('loginPart').style.display = 'none';
     document.getElementById('mainPart').style.display = 'block';
   } else {
-    document.getElementById('error').innerHTML = 'Wrong password';
+    document.getElementById('error').innerHTML = 'Wrong key';
   }
 }
 
-// Publish
+// Simple publish (photo optional)
 async function publish() {
   const btn = document.getElementById('publishBtn');
   const status = document.getElementById('statusMsg');
   btn.disabled = true;
-  btn.textContent = 'Publishing...';
-  status.textContent = 'Checking fields...';
+  btn.textContent = 'Adding...';
+  status.textContent = 'Saving...';
 
   const name = document.getElementById('name').value.trim();
   const price = document.getElementById('price').value.trim();
   if (!name || !price) {
-    status.textContent = '❌ Name and Price required';
-    btn.textContent = 'PUBLISH DROP';
+    status.textContent = 'Name and price needed';
+    btn.textContent = 'Add Brainrot';
     btn.disabled = false;
     return;
   }
 
-  status.textContent = 'Processing...';
   let img = "https://picsum.photos/300";
   const file = document.getElementById('photo').files[0];
   if (file) {
-    status.textContent = 'Reading photo...';
+    status.textContent = 'Adding photo...';
     img = await new Promise(r => {
       const reader = new FileReader();
       reader.onload = () => r(reader.result);
@@ -274,7 +133,7 @@ async function publish() {
     });
   }
 
-  status.textContent = 'Sending to server...';
+  status.textContent = 'Finishing...';
   const body = {
     name,
     desc: document.getElementById('desc').value,
@@ -287,33 +146,28 @@ async function publish() {
   };
 
   try {
-    const res = await fetch('/add-item', {
+    await fetch('/add-item', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(body)
     });
-    if (res.ok) {
-      status.textContent = '✅ Published!';
-      alert('Success! Returning to shop...');
-      closeOwner();
-      await loadItems();
-    } else {
-      throw new Error('Server error');
-    }
+    status.textContent = 'Done!';
+    alert('Added! Going back to shop...');
+    closeOwner();
+    await loadItems();
   } catch (err) {
-    status.textContent = '❌ ' + err.message;
-    console.error(err);
+    status.textContent = 'Error - try again';
+    console.log(err);
   } finally {
-    btn.textContent = 'PUBLISH DROP';
+    btn.textContent = 'Add Brainrot';
     btn.disabled = false;
-    setTimeout(() => status.textContent = '', 3000);
   }
 }
 
 // Load shop
 async function loadItems() {
   try {
-    const res = await fetch('/items?_=' + Date.now(), { cache: 'no-store' });
+    const res = await fetch('/items');
     const data = await res.json();
     document.getElementById('cards').innerHTML = data.map(i => `
       <div class="card">
@@ -325,7 +179,7 @@ async function loadItems() {
       </div>
     `).join('');
   } catch (err) {
-    console.error('Load failed', err);
+    console.log('Load error', err);
   }
 }
 
@@ -342,7 +196,6 @@ function startBuy(id, name, robuxL, visaL) {
 
 function choosePay(type) {
   closeModals();
-  currentType = type;
   document.getElementById('payLink').innerHTML = `Link: <a href="${type==='robux'?window.robuxL:window.visaL}" target="_blank">${type==='robux'?window.robuxL:window.visaL}</a>`;
   document.getElementById('step2').style.display = 'flex';
 }
@@ -359,7 +212,7 @@ function nextStep() {
 function sendToOwner() {
   const username = document.getElementById('robloxUser')?.value || 'Unknown';
   const proof = document.getElementById('proof')?.value || 'No proof';
-  alert(`Sent to owner!\n\nBrainrot: ${document.getElementById('buyTitle').textContent}\nRoblox: ${username}\nProof: ${proof}\n\n(Discord bot will notify owner)`);
+  alert(`Sent to owner!\n\nItem: ${document.getElementById('buyTitle').textContent}\nUsername: ${username}\nProof: ${proof}`);
   closeModals();
   loadItems();
 }
