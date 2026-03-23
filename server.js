@@ -21,14 +21,28 @@ db.serialize(() => {
   )`);
 });
 
-app.get("/items", (req, res) => db.all("SELECT * FROM items", [], (_, rows) => res.json(rows || [])));
+// This is the /items part you need — it sends all brainrots to the website
+app.get("/items", (req, res) => {
+  db.all("SELECT * FROM items", [], (err, rows) => {
+    if (err) {
+      console.error("DB error:", err);
+      return res.status(500).json({ error: "Server problem" });
+    }
+    console.log("Sending brainrots:", rows);
+    res.json(rows || []);
+  });
+});
+
+// Save new brainrot
 app.post("/add-item", (req, res) => {
   const { name, desc, img, price, robuxLink, visaLink, quantity, rarity } = req.body;
   db.run("INSERT INTO items (name, desc, img, price, robuxLink, visaLink, quantity, rarity) VALUES (?,?,?,?,?,?,?,?)",
     [name, desc, img, price, robuxLink, visaLink, quantity || 1, rarity || 'Common'],
-    () => res.json({success: true}));
+    (err) => {
+      if (err) console.error("Add error:", err);
+      res.json({ success: true });
+    }
+  );
 });
-app.post("/hold/:id", (req, res) => db.run("UPDATE items SET quantity = quantity - 1 WHERE id = ?", req.params.id, () => res.json({success: true})));
-app.post("/complete/:id", (req, res) => db.run("DELETE FROM items WHERE id = ?", req.params.id, () => res.json({success: true})));
 
-app.listen(process.env.PORT || 3000, () => console.log("✅ Running"));
+app.listen(process.env.PORT || 3000, () => console.log("Shop running"));
