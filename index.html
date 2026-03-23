@@ -16,7 +16,7 @@
     .card h3 { margin:0 0 6px; font-size:1.1rem; }
     .card p { margin:4px 0; font-size:0.9rem; color:#0c0; }
     .price { color:#0f0; font-weight:bold; }
-    .status { position:absolute; top:8px; right:8px; background:orange; color:black; padding:4px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold; display:none; }
+    .status { position:absolute; top:8px; right:8px; background:orange; color:black; padding:4px 8px; border-radius:4px; font-size:0.8rem; display:none; font-weight:bold; }
     button { padding:10px; font-size:0.95rem; margin-top:8px; border:none; border-radius:6px; cursor:pointer; width:100%; }
     .purchase-btn { background:#0f0; color:#000; }
     .in-buying-btn { background:orange; color:#000; }
@@ -81,14 +81,14 @@
   <div class="step">2/4</div>
   <h2>Payment Link</h2>
   <p id="payLink"></p>
-  <button onclick="finishStep2()" style="background:#0f0;color:#000;">I Purchased</button>
+  <button onclick="goToStep3()" style="background:#0f0;color:#000;">I Purchased</button>
 </div></div>
 
 <div id="step3" class="modal"><div class="panel">
   <div class="step">3/4</div>
   <h2>Your Roblox Username</h2>
   <input id="robloxUser" placeholder="Username">
-  <button onclick="nextStep()" style="background:#0f0;color:#000;">Submit</button>
+  <button onclick="goToStep4()" style="background:#0f0;color:#000;">Submit</button>
 </div></div>
 
 <div id="step4" class="modal"><div class="panel">
@@ -188,10 +188,9 @@ function startBuy(id, name, robuxL, visaL) {
   window.visaL = visaL;
   fetch(`/hold/${id}`, {method:'POST'});
 
-  // 5 minute timeout to release hold
   setTimeout(() => {
     document.getElementById(`hold${id}`).style.display = 'none';
-    loadItems(); // refresh to show normal button again
+    loadItems();
   }, 5 * 60 * 1000);
 }
 
