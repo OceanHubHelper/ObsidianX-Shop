@@ -6,29 +6,31 @@
   <title>ObsidianX Shop</title>
   <style>
     body { background:#000; color:#0f0; font-family:Arial; text-align:center; padding:15px; margin:0; }
-    h1 { color:#0f0; font-size:2.6rem; margin:15px 0; }
+    h1 { color:#0f0; font-size:2.5rem; margin:15px 0; }
     .refresh-text { color:#555; margin:15px 0; font-size:1rem; }
     .store { display:grid; grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)); gap:12px; max-width:1000px; margin:0 auto; }
-    .card { background:#111; border:2px solid #0f0; border-radius:10px; overflow:hidden; transition:0.3s; }
+    .card { background:#111; border:2px solid #0f0; border-radius:10px; overflow:hidden; transition:0.3s; position:relative; }
     .card:hover { transform:scale(1.03); box-shadow:0 0 20px #0f0; }
-    .card img { width:100%; height:170px; object-fit:cover; } /* better image fit */
+    .card img { width:100%; height:170px; object-fit:cover; }
     .card-content { padding:10px; }
     .card h3 { margin:0 0 6px; font-size:1.1rem; }
     .card p { margin:4px 0; font-size:0.9rem; color:#0c0; }
     .price { color:#0f0; font-weight:bold; }
-    button { padding:10px; font-size:0.95rem; margin-top:8px; border:none; border-radius:6px; cursor:pointer; width:100%; background:#0f0; color:#000; }
+    .status { position:absolute; top:8px; right:8px; background:orange; color:black; padding:4px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold; display:none; }
+    button { padding:10px; font-size:0.95rem; margin-top:8px; border:none; border-radius:6px; cursor:pointer; width:100%; }
+    .purchase-btn { background:#0f0; color:#000; }
+    .in-buying-btn { background:orange; color:#000; }
     #ownerFab { position:fixed; bottom:25px; right:25px; width:70px; height:70px; background:#0f0; color:#000; font-size:2.5rem; border:none; border-radius:50%; box-shadow:0 0 20px #0f0; z-index:9999; }
     .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:9998; align-items:center; justify-content:center; padding:10px; }
     .panel { background:#111; border:3px solid #0f0; border-radius:12px; padding:20px; width:100%; max-width:420px; max-height:85vh; overflow-y:auto; }
     input, select { width:100%; padding:10px; margin:8px 0; background:#222; border:1px solid #0f0; color:#0f0; border-radius:6px; }
     .step { color:#555; font-size:0.9rem; margin-bottom:8px; }
-    .status { position:absolute; top:8px; right:8px; background:orange; color:black; padding:4px 8px; border-radius:4px; font-size:0.8rem; display:none; }
   </style>
 </head>
 <body>
 
 <h1>ObsidianX Shop</h1>
-<p class="refresh-text">Pull down to refresh if needed</p>
+<p class="refresh-text">Pull down to refresh for new brainrots</p>
 
 <div class="store" id="cards"></div>
 
@@ -79,7 +81,7 @@
   <div class="step">2/4</div>
   <h2>Payment Link</h2>
   <p id="payLink"></p>
-  <button onclick="nextStep()" style="background:#0f0;color:#000;">I Purchased</button>
+  <button onclick="finishStep2()" style="background:#0f0;color:#000;">I Purchased</button>
 </div></div>
 
 <div id="step3" class="modal"><div class="panel">
@@ -110,8 +112,10 @@ async function loadItems() {
         <div class="card-content">
           <h3>${i.name}</h3>
           <p>${i.desc || ''}</p>
-          <p class="price">${i.price.includes('$') ? 'Price: ' : 'Robux Price: '}${i.price}</p>
-          <button onclick="startBuy(${i.id}, '${i.name}', '${i.robuxLink}', '${i.visaLink}')">Purchase</button>
+          <p class="price">${i.price.includes('$') ? 'Price: ' + i.price : 'Robux Price: ' + i.price}</p>
+          <button class="${i.quantity <= 0 ? 'in-buying-btn' : 'purchase-btn'}" onclick="${i.quantity <= 0 ? 'alert(\'Sorry, this brainrot is in buying. Try purchasing another or wait a little longer.\')' : 'startBuy(' + i.id + ', \\'' + i.name + '\\', \\'' + i.robuxLink + '\\', \\'' + i.visaLink + '\\')'}">
+            ${i.quantity <= 0 ? 'In Buying' : 'Purchase'}
+          </button>
           <div class="status" id="hold${i.id}">IN BUYING</div>
         </div>
       </div>
@@ -164,7 +168,7 @@ async function publish() {
     msg.textContent = 'Done!';
     alert('Added! Back to shop...');
     closeOwner();
-    loadItems(); // auto show new card
+    loadItems();
   } catch (err) {
     msg.textContent = 'Failed';
   } finally {
@@ -177,23 +181,47 @@ async function publish() {
 function startBuy(id, name, robuxL, visaL) {
   currentId = id;
   document.getElementById(`hold${id}`).style.display = 'block';
+  loadItems(); // refresh to show orange button
   document.getElementById('buyTitle').textContent = name;
   document.getElementById('step1').style.display = 'flex';
   window.robuxL = robuxL;
   window.visaL = visaL;
   fetch(`/hold/${id}`, {method:'POST'});
 
-  // 5 minute timeout
+  // 5 minute timeout to release hold
   setTimeout(() => {
     document.getElementById(`hold${id}`).style.display = 'none';
-    fetch(`/hold/${id}`, {method:'POST'}); // release hold
+    loadItems(); // refresh to show normal button again
   }, 5 * 60 * 1000);
 }
 
-function choosePay(type) { closeModals(); document.getElementById('payLink').innerHTML = `Link: <a href="${type==='robux'?window.robuxL:window.visaL}" target="_blank">${type==='robux'?window.robuxL:window.visaL}</a>`; document.getElementById('step2').style.display = 'flex'; }
-function nextStep() { closeModals(); if (document.getElementById('step2').style.display === 'flex') document.getElementById('step3').style.display = 'flex'; else if (document.getElementById('step3').style.display === 'flex') document.getElementById('step4').style.display = 'flex'; }
-function sendToOwner() { alert('Sent to owner!'); closeModals(); loadItems(); }
-function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+function choosePay(type) {
+  closeModals();
+  document.getElementById('payLink').innerHTML = `Link: <a href="${type==='robux'?window.robuxL:window.visaL}" target="_blank">${type==='robux'?window.robuxL:window.visaL}</a>`;
+  document.getElementById('step2').style.display = 'flex';
+}
+
+function finishStep2() {
+  closeModals();
+  document.getElementById('step3').style.display = 'flex';
+}
+
+function nextStep() {
+  closeModals();
+  document.getElementById('step4').style.display = 'flex';
+}
+
+function sendToOwner() {
+  const username = document.getElementById('robloxUser')?.value || 'Unknown';
+  const proof = document.getElementById('proof')?.value || 'No proof';
+  alert('Sent to owner!\n\nItem: ' + document.getElementById('buyTitle').textContent + '\nUsername: ' + username + '\nProof: ' + proof);
+  closeModals();
+  loadItems();
+}
+
+function closeModals() {
+  document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+}
 
 // Owner
 document.getElementById('ownerFab').onclick = () => document.getElementById('ownerPanel').style.display = 'flex';
@@ -210,33 +238,3 @@ loadItems();
 </script>
 </body>
 </html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ObsidianX Shop</title>
-  <style>
-    body { background:#000; color:#0f0; font-family:Arial; text-align:center; padding:15px; margin:0; }
-    h1 { color:#0f0; font-size:2.6rem; margin:15px 0; }
-    .refresh-text { color:#555; margin:15px 0; font-size:1rem; }
-    .store { display:grid; grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)); gap:12px; max-width:1000px; margin:0 auto; }
-    .card { background:#111; border:2px solid #0f0; border-radius:10px; overflow:hidden; transition:0.3s; }
-    .card:hover { transform:scale(1.03); box-shadow:0 0 20px #0f0; }
-    .card img { width:100%; height:170px; object-fit:cover; } /* better image fit */
-    .card-content { padding:10px; }
-    .card h3 { margin:0 0 6px; font-size:1.1rem; }
-    .card p { margin:4px 0; font-size:0.9rem; color:#0c0; }
-    .price { color:#0f0; font-weight:bold; }
-    button { padding:10px; font-size:0.95rem; margin-top:8px; border:none; border-radius:6px; cursor:pointer; width:100%; background:#0f0; color:#000; }
-    #ownerFab { position:fixed; bottom:25px; right:25px; width:70px; height:70px; background:#0f0; color:#000; font-size:2.5rem; border:none; border-radius:50%; box-shadow:0 0 20px #0f0; z-index:9999; }
-    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:9998; align-items:center; justify-content:center; padding:10px; }
-    .panel { background:#111; border:3px solid #0f0; border-radius:12px; padding:20px; width:100%; max-width:420px; max-height:85vh; overflow-y:auto; }
-    input, select { width:100%; padding:10px; margin:8px 0; background:#222; border:1px solid #0f0; color:#0f0; border-radius:6px; }
-    .step { color:#555; font-size:0.9rem; margin-bottom:8px; }
-    .status { position:absolute; top:8px; right:8px; background:orange; color:black; padding:4px 8px; border-radius:4px; font-size:0.8rem; display:none; }
-  </style>
-</head>
-<body>
-
-<h1>sidian
