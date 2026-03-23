@@ -23,7 +23,9 @@
 <h1>ObsidianX Shop</h1>
 <p style="color:#555;">Pull down to refresh if needed</p>
 
-<div class="store" id="cards"></div>
+<div class="store" id="cards">
+  <p style="color:#555;">Loading brainrots...</p>
+</div>
 
 <button id="ownerFab">👑</button>
 
@@ -38,7 +40,7 @@
       <div id="error" style="color:red;margin:8px 0;"></div>
     </div>
     <div id="mainPart" style="display:none;">
-      <input id="name" placeholder="Title / Name" required>
+      <input id="name" placeholder="Name" required>
       <input id="desc" placeholder="Description">
       <input id="price" placeholder="Price (e.g. 399 Robux)" required>
       <input id="robuxLink" placeholder="Robux Link">
@@ -60,7 +62,29 @@
 </div>
 
 <script>
-// Simple publish
+// Load brainrots
+async function loadItems() {
+  try {
+    const res = await fetch('/items?_=' + Date.now());
+    const data = await res.json();
+    document.getElementById('cards').innerHTML = data.length === 0 
+      ? '<p style="color:#555">No brainrots yet - add one in owner panel</p>'
+      : data.map(i => `
+        <div class="card">
+          <img src="${i.img}">
+          <h3>${i.name}</h3>
+          <p>${i.desc || ''}</p>
+          <p style="color:#0f0;font-weight:bold;">${i.price}</p>
+          <p>Robux Link: <a href="${i.robuxLink || '#'}" target="_blank">${i.robuxLink ? 'Click' : 'N/A'}</a></p>
+          <button onclick="alert('Buy flow starts here')">Purchase</button>
+        </div>
+      `).join('');
+  } catch (err) {
+    document.getElementById('cards').innerHTML = '<p style="color:red">Error loading - refresh page</p>';
+  }
+}
+
+// Publish
 async function publish() {
   const btn = document.getElementById('publishBtn');
   const msg = document.getElementById('statusMsg');
@@ -105,43 +129,22 @@ async function publish() {
       body: JSON.stringify(body)
     });
     if (res.ok) {
-      msg.textContent = 'Added!';
-      alert('Brainrot added! Going back to shop...');
+      msg.textContent = 'Done!';
+      alert('Added! Back to shop...');
       closeOwner();
-      await loadItems(); // reload right away
+      loadItems(); // reload immediately
     } else {
       msg.textContent = 'Server error';
     }
   } catch (err) {
-    msg.textContent = 'Failed - check connection';
-    console.log(err);
+    msg.textContent = 'Failed - try again';
   } finally {
     btn.textContent = 'Add Brainrot';
     btn.disabled = false;
   }
 }
 
-// Load shop - this is the key fix
-async function loadItems() {
-  try {
-    const res = await fetch('/items?_=' + new Date().getTime());
-    const data = await res.json();
-    document.getElementById('cards').innerHTML = data.map(i => `
-      <div class="card">
-        <img src="${i.img}">
-        <h3>${i.name}</h3>
-        <p>${i.desc || ''}</p>
-        <p style="color:#0f0;font-weight:bold;">${i.price}</p>
-        <p>Robux: <a href="${i.robuxLink || '#'}" target="_blank">${i.robuxLink ? 'Link' : 'N/A'}</a></p>
-        <button onclick="alert('Buy flow starts here')">Purchase</button>
-      </div>
-    `).join('');
-  } catch (err) {
-    document.getElementById('cards').innerHTML = '<p style="color:red">No brainrots loaded. Refresh page.</p>';
-  }
-}
-
-// Owner panel basics
+// Owner panel
 document.getElementById('ownerFab').onclick = () => document.getElementById('ownerPanel').style.display = 'flex';
 function closeOwner() { document.getElementById('ownerPanel').style.display = 'none'; }
 function unlock() {
