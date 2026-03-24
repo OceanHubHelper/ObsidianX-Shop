@@ -6,13 +6,14 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
 
-const db = new sqlite3.Database("/data/brainrots.db");
+const dbPath = "/data/brainrots.db";
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) console.error("❌ DB open error:", err.message);
+  else console.log("✅ Connected to SQLite at", dbPath);
+});
 
 db.serialize(() => {
-  // Drop old table so we get the new columns
-  db.run("DROP TABLE IF EXISTS items");
-
-  db.run(`CREATE TABLE items (
+  db.run(`CREATE TABLE IF NOT EXISTS items (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     desc TEXT,
@@ -23,13 +24,19 @@ db.serialize(() => {
     quantity INTEGER DEFAULT 1,
     rarity TEXT,
     img TEXT
-  )`);
-  console.log("✅ Database table recreated with moneyPrice and robuxPrice");
+  )`, (err) => {
+    if (err) console.error("Table creation error:", err);
+    else console.log("✅ Table ready (or already existed)");
+  });
 });
 
 app.get("/items", (req, res) => {
   db.all("SELECT * FROM items", [], (err, rows) => {
-    if (err) console.error(err);
+    if (err) {
+      console.error("Items fetch error:", err);
+      return res.status(500).json([]);
+    }
+    console.log(`📦 Sending ${rows.length} brainrots`);
     res.json(rows || []);
   });
 });
@@ -41,25 +48,27 @@ app.post("/add-item", (req, res) => {
     [name, desc, moneyPrice, robuxPrice, robuxLink, visaLink, quantity || 1, rarity, img],
     function(err) {
       if (err) {
-        console.error(err);
+        console.error("Add item error:", err);
         return res.status(500).json({error: err.message});
       }
-      console.log("✅ New brainrot added:", name);
+      console.log("✅ Brainrot added:", name);
       res.json({success: true});
     }
   );
 });
 
 app.post("/hold/:id", (req, res) => {
-  db.run("UPDATE items SET quantity = 0 WHERE id = ?", [req.params.id]);
-  res.json({success: true});
+  db.run("UPDATE items SET quantity = 0 WHERE id = ?", [req.params.id], () => {
+    res.json({success: true});
+  });
 });
 
 app.post("/purchase-complete", (req, res) => {
-  console.log("📩 Purchase received from shop:", req.body);
+  console.log("📩 Purchase data received:", req.body);
   res.json({success: true});
 });
 
-app.listen(3000, () => {
-  console.log("🚀 Server running on port 3000");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
