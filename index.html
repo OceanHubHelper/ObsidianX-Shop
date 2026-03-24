@@ -5,41 +5,167 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ObsidianX Shop</title>
   <style>
-    body { background:#000; color:#0f0; font-family:Arial; text-align:center; padding:20px; margin:0; }
-    h1 { color:#0f0; font-size:2.5rem; margin:20px 0; }
-    .store { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:15px; max-width:1000px; margin:0 auto; }
-    .card { background:#111; border:2px solid #0f0; border-radius:10px; padding:12px; }
-    .card img { width:100%; height:160px; object-fit:cover; border-radius:8px; }
-    button { padding:12px; font-size:1rem; margin:6px 0; border:none; border-radius:8px; cursor:pointer; width:100%; background:#0f0; color:#000; }
-    #ownerFab { position:fixed; bottom:25px; right:25px; width:70px; height:70px; background:#0f0; color:#000; font-size:2.5rem; border:none; border-radius:50%; box-shadow:0 0 20px #0f0; z-index:9999; }
-    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9998; align-items:center; justify-content:center; padding:10px; }
-    .panel { background:#111; border:3px solid #0f0; border-radius:12px; padding:25px; width:100%; max-width:420px; max-height:85vh; overflow-y:auto; }
-    input, select { width:100%; padding:10px; margin:8px 0; background:#222; border:1px solid #0f0; color:#0f0; border-radius:6px; }
-    #statusMsg { color:#ff0; margin:10px 0; font-weight:bold; }
+    body {
+      background: #0a0a0a;
+      color: #e0e0e0;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #ff4d4d;
+      text-align: center;
+      margin: 20px 0;
+      font-size: 2.8rem;
+      text-shadow: 0 0 10px #ff3300;
+    }
+
+    .store {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 15px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #111;
+      border: 2px solid #333;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.4s;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      border-color: #ff4d4d;
+      box-shadow: 0 12px 35px rgba(255,77,77,0.4);
+    }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-bottom: 2px solid #222;
+    }
+
+    .card-content {
+      padding: 12px;
+      text-align: left;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 1.2rem;
+      color: #fff;
+    }
+
+    .card p {
+      margin: 4px 0;
+      font-size: 0.9rem;
+      color: #bbb;
+    }
+
+    .price {
+      color: #ff4d4d;
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin: 8px 0;
+    }
+
+    button {
+      padding: 12px;
+      font-size: 1rem;
+      margin-top: 8px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      background: #ff4d4d;
+      color: white;
+      font-weight: bold;
+    }
+
+    #ownerFab {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 70px;
+      height: 70px;
+      background: #ff4d4d;
+      color: white;
+      font-size: 2.5rem;
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 0 25px #ff3300;
+      z-index: 9999;
+      cursor: pointer;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      z-index: 9998;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+    }
+
+    .panel {
+      background: #111;
+      border: 3px solid #ff4d4d;
+      border-radius: 12px;
+      padding: 25px;
+      width: 100%;
+      max-width: 420px;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      background: #1a1a1a;
+      border: 1px solid #ff4d4d;
+      color: #e0e0e0;
+      border-radius: 6px;
+    }
+
+    #statusMsg {
+      color: #ff9900;
+      margin-top: 10px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
 <h1>ObsidianX Shop</h1>
-<p style="color:#555;">Pull down to refresh if needed</p>
+<p style="color:#666;">Pull down to refresh for new drops</p>
 
-<div class="store" id="cards"></div>
+<div class="store" id="cards">
+  <p style="color:#666;">Loading brainrots...</p>
+</div>
 
 <button id="ownerFab">👑</button>
 
+<!-- Owner Panel -->
 <div id="ownerPanel" class="modal">
   <div class="panel">
-    <button onclick="closeOwner()" style="float:right;background:red;color:white;border:none;padding:8px 14px;border-radius:50%;">×</button>
-    <h2 style="color:#0f0;">Owner Area</h2>
-
-    <div id="loginPart">
-      <input id="pass" type="password" placeholder="Key">
-      <button onclick="unlock()" style="background:#0f0;color:#000;margin-top:10px;">Open</button>
-      <div id="error" style="color:red;margin:10px 0;"></div>
-    </div>
+    <button onclick="document.getElementById('ownerPanel').style.display='none'" style="float:right;background:#ff1a1a;color:white;border:none;padding:8px 14px;border-radius:50%;">×</button>
+    <h2 style="color:#ff4d4d;">Owner Vault Access</h2>
+    <input id="pass" type="password" placeholder="Access Key">
+    <button onclick="unlock()" style="background:#ff4d4d;color:white;margin-top:10px;">Unlock</button>
+    <div id="error" style="color:#ff3366;margin:10px 0;"></div>
 
     <div id="mainPart" style="display:none;margin-top:20px;">
-      <input id="name" placeholder="Name" required>
+      <input id="name" placeholder="Brainrot Name" required>
       <input id="desc" placeholder="Description">
       <input id="price" placeholder="Price (e.g. 399 Robux)" required>
       <input id="robuxLink" placeholder="Robux Link">
@@ -54,46 +180,40 @@
         <option value="OG">OG</option>
       </select>
       <input type="file" id="photo" accept="image/*">
-      <button onclick="publish()" id="publishBtn" style="background:#0f0;color:#000;margin-top:15px;">Add Brainrot</button>
-      <div id="statusMsg" style="color:#ff0;margin-top:10px;"></div>
+      <button onclick="publish()" id="publishBtn" style="background:#ff4d4d;color:white;margin-top:15px;">Forge Brainrot</button>
+      <div id="statusMsg" style="color:#ff9900;margin-top:10px;"></div>
     </div>
   </div>
 </div>
 
 <script>
-// Owner button
+// Simple owner button
 document.getElementById('ownerFab').onclick = function() {
   document.getElementById('ownerPanel').style.display = 'flex';
 };
 
-function closeOwner() {
-  document.getElementById('ownerPanel').style.display = 'none';
-}
-
 function unlock() {
-  const pass = document.getElementById('pass').value;
-  if (pass === "favela23") {
-    document.getElementById('loginPart').style.display = 'none';
+  if (document.getElementById('pass').value === "favela23") {
     document.getElementById('mainPart').style.display = 'block';
-    document.getElementById('error').innerHTML = '';
+    document.getElementById('loginPart').style.display = 'none';
   } else {
     document.getElementById('error').innerHTML = 'Wrong key';
   }
 }
 
-// Publish
+// Publish brainrot
 async function publish() {
   const btn = document.getElementById('publishBtn');
   const msg = document.getElementById('statusMsg');
   btn.disabled = true;
-  btn.textContent = 'Adding...';
+  btn.textContent = 'Forging...';
   msg.textContent = 'Saving...';
 
   const name = document.getElementById('name').value.trim();
   const price = document.getElementById('price').value.trim();
   if (!name || !price) {
     msg.textContent = 'Name and price required';
-    btn.textContent = 'Add Brainrot';
+    btn.textContent = 'Forge Brainrot';
     btn.disabled = false;
     return;
   }
@@ -120,20 +240,24 @@ async function publish() {
   };
 
   try {
-    await fetch('/add-item', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
-    msg.textContent = 'Added!';
-    alert('Brainrot added! Back to shop...');
-    closeOwner();
+    await fetch('/add-item', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
+    });
+    msg.textContent = 'Forged!';
+    alert('Brainrot added! Check shop...');
+    document.getElementById('ownerPanel').style.display = 'none';
     loadItems();
   } catch (err) {
-    msg.textContent = 'Failed - try again';
+    msg.textContent = 'Failed - refresh page';
   } finally {
-    btn.textContent = 'Add Brainrot';
+    btn.textContent = 'Forge Brainrot';
     btn.disabled = false;
   }
 }
 
-// Load shop
+// Load shop cards
 async function loadItems() {
   try {
     const res = await fetch('/items?_=' + Date.now());
@@ -141,10 +265,12 @@ async function loadItems() {
     document.getElementById('cards').innerHTML = data.map(i => `
       <div class="card">
         <img src="${i.img}">
-        <h3>${i.name}</h3>
-        <p>${i.desc || ''}</p>
-        <p style="color:#0f0;font-weight:bold;">${i.price}</p>
-        <button onclick="alert('Buy flow starts here')">Purchase</button>
+        <div class="card-content">
+          <h3>${i.name}</h3>
+          <p>${i.desc || ''}</p>
+          <p class="price">${i.price.includes('$') ? 'Price: ' + i.price : 'Robux Price: ' + i.price}</p>
+          <button onclick="alert('Buy flow starts here')">Purchase</button>
+        </div>
       </div>
     `).join('');
   } catch (err) {
@@ -152,7 +278,7 @@ async function loadItems() {
   }
 }
 
-// Start
+// Start loading brainrots
 loadItems();
 </script>
 </body>
