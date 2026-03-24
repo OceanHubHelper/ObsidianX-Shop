@@ -5,31 +5,139 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ObsidianX Brainrot Store</title>
   <style>
-    body { background:#0a0a0a; color:#e0e0e0; font-family:Arial; margin:0; padding:20px; }
-    h1 { color:#ff4d4d; text-align:center; margin:20px 0; font-size:2.8rem; text-shadow:0 0 15px #ff3300; }
-    .store { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:15px; max-width:1200px; margin:0 auto; }
-    .card { background:#111; border:2px solid #333; border-radius:12px; overflow:hidden; position:relative; transition:0.4s; }
-    .card:hover { transform:translateY(-8px); border-color:#ff4d4d; box-shadow:0 12px 35px rgba(255,77,77,0.4); }
-    .card img { width:100%; height:180px; object-fit:cover; border-bottom:2px solid #222; }
-    .card-content { padding:12px; }
-    .card h3 { margin:0 0 8px; font-size:1.2rem; color:#fff; }
-    .card p { margin:4px 0; font-size:0.9rem; color:#bbb; }
-    .price { color:#ff4d4d; font-weight:bold; font-size:1.05rem; margin:6px 0; }
-    .status { position:absolute; top:10px; right:10px; background:#ff6600; color:white; padding:4px 12px; border-radius:6px; font-size:0.8rem; font-weight:bold; display:none; }
-    button { padding:12px; font-size:1rem; margin-top:8px; border:none; border-radius:8px; cursor:pointer; width:100%; }
+    body { 
+      background:#0a0a0a; 
+      color:#e0e0e0; 
+      font-family:Arial; 
+      margin:0; 
+      padding:20px; 
+    }
+    h1 { 
+      color:#ff4d4d; 
+      text-align:center; 
+      margin:20px 0; 
+      font-size:2.8rem; 
+      text-shadow:0 0 15px #ff3300; 
+    }
+    .store { 
+      display:grid; 
+      grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); 
+      gap:15px; 
+      max-width:1200px; 
+      margin:0 auto; 
+    }
+    .card { 
+      background:#111; 
+      border:2px solid #333; 
+      border-radius:12px; 
+      overflow:hidden; 
+      position:relative; 
+      transition:0.4s; 
+    }
+    .card:hover { 
+      transform:translateY(-8px); 
+      border-color:#ff4d4d; 
+      box-shadow:0 12px 35px rgba(255,77,77,0.4); 
+    }
+    .card img { 
+      width:100%; 
+      height:160px; 
+      object-fit:cover; 
+    }
+    .card-content { 
+      padding:12px; 
+      text-align:left; 
+    }
+    .card h3 { 
+      margin:0 0 8px; 
+      font-size:1.25rem; 
+      color:#fff; 
+      font-weight:bold; 
+    }
+    .card .desc { 
+      margin:4px 0 10px; 
+      font-size:0.95rem; 
+      color:#bbb; 
+    }
+    .price { 
+      color:#ff4d4d; 
+      font-weight:bold; 
+      font-size:1.1rem; 
+      margin:4px 0; 
+    }
+    .status { 
+      position:absolute; 
+      top:10px; 
+      right:10px; 
+      background:#ff6600; 
+      color:white; 
+      padding:4px 12px; 
+      border-radius:6px; 
+      font-size:0.8rem; 
+      font-weight:bold; 
+      display:none; 
+    }
+    button { 
+      padding:14px; 
+      font-size:1.1rem; 
+      margin-top:12px; 
+      border:none; 
+      border-radius:8px; 
+      cursor:pointer; 
+      width:100%; 
+      font-weight:bold; 
+    }
     .purchase-btn { background:#ff4d4d; color:white; }
     .in-buying-btn { background:#ff6600; color:white; }
 
     #ownerFab {
-      position:fixed; bottom:30px; right:30px; width:70px; height:70px;
-      background:#ff4d4d; color:white; font-size:2.2rem; border:none;
-      border-radius:12px; box-shadow:0 0 25px #ff3300; z-index:9999;
-      display:flex; align-items:center; justify-content:center; cursor:pointer;
+      position:fixed; 
+      bottom:30px; 
+      right:30px; 
+      width:70px; 
+      height:70px;
+      background:#ff4d4d; 
+      color:white; 
+      font-size:2.2rem; 
+      border:none;
+      border-radius:12px; 
+      box-shadow:0 0 25px #ff3300; 
+      z-index:9999;
+      display:flex; 
+      align-items:center; 
+      justify-content:center; 
+      cursor:pointer;
     }
 
-    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:9998; align-items:center; justify-content:center; padding:10px; }
-    .panel { background:#111; border:3px solid #ff4d4d; border-radius:12px; padding:25px; width:100%; max-width:420px; max-height:85vh; overflow-y:auto; }
-    input, select { width:100%; padding:10px; margin:8px 0; background:#1a1a1a; border:1px solid #ff4d4d; color:#e0e0e0; border-radius:6px; }
+    .modal { 
+      display:none; 
+      position:fixed; 
+      inset:0; 
+      background:rgba(0,0,0,0.95); 
+      z-index:9998; 
+      align-items:center; 
+      justify-content:center; 
+      padding:10px; 
+    }
+    .panel { 
+      background:#111; 
+      border:3px solid #ff4d4d; 
+      border-radius:12px; 
+      padding:25px; 
+      width:100%; 
+      max-width:420px; 
+      max-height:85vh; 
+      overflow-y:auto; 
+    }
+    input, select { 
+      width:100%; 
+      padding:10px; 
+      margin:8px 0; 
+      background:#1a1a1a; 
+      border:1px solid #ff4d4d; 
+      color:#e0e0e0; 
+      border-radius:6px; 
+    }
   </style>
 </head>
 <body>
@@ -52,9 +160,9 @@
 
     <div id="mainPart" style="display:none;margin-top:20px;">
       <input id="name" placeholder="Brainrot Name" required>
-      <input id="desc" placeholder="Description">
+      <input id="desc" placeholder="Description (e.g. Lava, 400m/s)">
       <input id="moneyPrice" placeholder="Cost $" required>
-      <input id="robuxPrice" placeholder="Robux Price (e.g. 4T)" required>
+      <input id="robuxPrice" placeholder="Robux Price (e.g. 599)" required>
       <input id="robuxLink" placeholder="Robux Link">
       <input id="visaLink" placeholder="Visa Link">
       <input type="number" id="quantity" value="1" min="1">
@@ -121,7 +229,7 @@ function unlock() {
   }
 }
 
-// Publish with separate money and robux price
+// Publish
 async function publish() {
   const btn = document.getElementById('publishBtn');
   const msg = document.getElementById('statusMsg');
@@ -153,7 +261,6 @@ async function publish() {
   const body = {
     name,
     desc: document.getElementById('desc').value,
-    price: `$${moneyPrice} / ${robuxPrice} Robux`,   // combined for display
     moneyPrice,
     robuxPrice,
     robuxLink: document.getElementById('robuxLink').value,
@@ -177,7 +284,7 @@ async function publish() {
   }
 }
 
-// Load cards - shows both prices
+// Load cards - clean prices like your screenshot
 async function loadItems() {
   try {
     const res = await fetch('/items?_=' + Date.now());
@@ -187,9 +294,8 @@ async function loadItems() {
         <img src="${i.img}">
         <div class="card-content">
           <h3>${i.name}</h3>
-          <p>${i.desc || ''}</p>
-          <p class="price">Price: $${i.moneyPrice || i.price}</p>
-          <p class="price">Robux Price: ${i.robuxPrice || '—'}</p>
+          <p class="desc">${i.desc || ''}</p>
+          <p class="price">Price: $${i.moneyPrice} / ${i.robuxPrice} Robux</p>
           <button class="${i.quantity <= 0 ? 'in-buying-btn' : 'purchase-btn'}" 
                   onclick="${i.quantity <= 0 ? `alert('Sorry, this brainrot is in buying. Try purchasing another or wait a little longer.')` : `startBuy(${i.id}, '${i.name.replace(/'/g,"\\'")}', '${i.robuxLink}', '${i.visaLink}')`}">
             ${i.quantity <= 0 ? 'In Buying' : 'Purchase'}
