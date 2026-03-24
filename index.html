@@ -53,7 +53,7 @@
     <div id="mainPart" style="display:none;margin-top:20px;">
       <input id="name" placeholder="Brainrot Name" required>
       <input id="desc" placeholder="Description">
-      <input id="price" placeholder="Price (e.g. 399 Robux)" required>
+      <input id="price" placeholder="Cost $" required>
       <input id="robuxLink" placeholder="Robux Link">
       <input id="visaLink" placeholder="Visa Link">
       <input type="number" id="quantity" value="1" min="1">
@@ -170,7 +170,7 @@ async function publish() {
   }
 }
 
-// Load cards
+// Load cards with price and IN BUYING fix
 async function loadItems() {
   try {
     const res = await fetch('/items?_=' + Date.now());
@@ -181,7 +181,7 @@ async function loadItems() {
         <div class="card-content">
           <h3>${i.name}</h3>
           <p>${i.desc || ''}</p>
-          <p class="price">${i.price.includes('$') ? 'Price: ' + i.price : 'Robux Price: ' + i.price}</p>
+          <p class="price">Price: $${i.price.replace('$','')}</p>
           <button class="${i.quantity <= 0 ? 'in-buying-btn' : 'purchase-btn'}" 
                   onclick="${i.quantity <= 0 ? `alert('Sorry, this brainrot is in buying. Try purchasing another or wait a little longer.')` : `startBuy(${i.id}, '${i.name.replace(/'/g,"\\'")}', '${i.robuxLink}', '${i.visaLink}')`}">
             ${i.quantity <= 0 ? 'In Buying' : 'Purchase'}
@@ -195,23 +195,15 @@ async function loadItems() {
   }
 }
 
-// Buy flow
+// Buy flow - IN BUYING starts at step 2
 function startBuy(id, name, robuxL, visaL) {
   currentId = id;
   currentName = name;
-  document.getElementById(`hold${id}`).style.display = 'block';
-  loadItems();
-
   document.getElementById('buyTitle').textContent = name;
   document.getElementById('step1').style.display = 'flex';
 
   window.currentRobuxLink = robuxL;
   window.currentVisaLink = visaL;
-
-  setTimeout(() => { // auto release after 5 min
-    document.getElementById(`hold${id}`).style.display = 'none';
-    loadItems();
-  }, 300000);
 }
 
 function choosePay(type) {
@@ -222,6 +214,12 @@ function choosePay(type) {
 }
 
 function goToStep3() {
+  // Trigger IN BUYING immediately when they click "I Purchased"
+  if (currentId) {
+    document.getElementById(`hold${currentId}`).style.display = 'block';
+    fetch(`/hold/${currentId}`, {method:'POST'});
+    loadItems();
+  }
   closeModals();
   document.getElementById('step3').style.display = 'flex';
 }
@@ -235,18 +233,11 @@ async function sendToOwner() {
   const username = document.getElementById('robloxUser').value.trim() || 'Unknown';
   const proof = document.getElementById('proof').value.trim() || 'No proof';
 
-  // Send purchase data to server (this will trigger Discord bot later)
   try {
     await fetch('/purchase-complete', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        id: currentId,
-        name: currentName,
-        username: username,
-        proof: proof,
-        type: 'pending'  // will be updated to robux or visa when you confirm
-      })
+      body: JSON.stringify({ id: currentId, name: currentName, username, proof })
     });
   } catch (e) {}
 
