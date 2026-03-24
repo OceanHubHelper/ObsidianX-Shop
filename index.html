@@ -3,31 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ObsidianX Shop</title>
+  <title>ObsidianX Brainrot Store</title>
   <style>
-    body { background:#0a0a0a; color:#e0e0e0; font-family:Arial; text-align:center; padding:20px; margin:0; }
-    h1 { color:#ff4d4d; font-size:2.8rem; margin:20px 0; text-shadow:0 0 10px #ff3300; }
+    body { background:#0a0a0a; color:#e0e0e0; font-family:Arial; margin:0; padding:20px; }
+    h1 { color:#ff4d4d; text-align:center; margin:20px 0; font-size:2.8rem; text-shadow:0 0 15px #ff3300; }
     .store { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:15px; max-width:1200px; margin:0 auto; }
-    .card { background:#111; border:2px solid #333; border-radius:12px; overflow:hidden; transition:0.4s; position:relative; }
+    .card { background:#111; border:2px solid #333; border-radius:12px; overflow:hidden; position:relative; transition:0.4s; }
     .card:hover { transform:translateY(-8px); border-color:#ff4d4d; box-shadow:0 12px 35px rgba(255,77,77,0.4); }
     .card img { width:100%; height:180px; object-fit:cover; border-bottom:2px solid #222; }
     .card-content { padding:12px; }
     .card h3 { margin:0 0 8px; font-size:1.2rem; color:#fff; }
     .card p { margin:4px 0; font-size:0.9rem; color:#bbb; }
-    .price { color:#ff4d4d; font-weight:bold; font-size:1.1rem; }
-    .status { position:absolute; top:10px; right:10px; background:#ff6600; color:white; padding:4px 10px; border-radius:6px; font-size:0.8rem; font-weight:bold; display:none; }
+    .price { color:#ff4d4d; font-weight:bold; font-size:1.1rem; margin:8px 0; }
+    .status { position:absolute; top:10px; right:10px; background:#ff6600; color:white; padding:4px 12px; border-radius:6px; font-size:0.8rem; font-weight:bold; display:none; }
     button { padding:12px; font-size:1rem; margin-top:8px; border:none; border-radius:8px; cursor:pointer; width:100%; }
     .purchase-btn { background:#ff4d4d; color:white; }
     .in-buying-btn { background:#ff6600; color:white; }
-    #ownerFab { position:fixed; bottom:30px; right:30px; width:70px; height:70px; background:#ff4d4d; color:white; font-size:2.5rem; border:none; border-radius:50%; box-shadow:0 0 25px #ff3300; z-index:9999; cursor:pointer; }
-    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9998; align-items:center; justify-content:center; padding:10px; }
+
+    #ownerFab {
+      position:fixed; bottom:30px; right:30px; width:70px; height:70px;
+      background:#ff4d4d; color:white; font-size:2.2rem; border:none;
+      border-radius:12px; box-shadow:0 0 25px #ff3300; z-index:9999;
+      display:flex; align-items:center; justify-content:center; cursor:pointer;
+    }
+
+    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:9998; align-items:center; justify-content:center; padding:10px; }
     .panel { background:#111; border:3px solid #ff4d4d; border-radius:12px; padding:25px; width:100%; max-width:420px; max-height:85vh; overflow-y:auto; }
     input, select { width:100%; padding:10px; margin:8px 0; background:#1a1a1a; border:1px solid #ff4d4d; color:#e0e0e0; border-radius:6px; }
   </style>
 </head>
 <body>
 
-<h1>ObsidianX Vault</h1>
+<h1>ObsidianX Brainrot Store</h1>
 <p style="color:#666;">Pull down to refresh for new drops</p>
 
 <div class="store" id="cards"></div>
@@ -67,43 +74,47 @@
 
 <!-- Buy Steps -->
 <div id="step1" class="modal"><div class="panel">
-  <div class="step">1/4</div>
+  <div style="font-size:1.2rem;margin-bottom:15px;">1/4</div>
   <h2 id="buyTitle"></h2>
-  <button onclick="choosePay('robux')" style="background:#ff4d4d;color:white;">Robux</button>
-  <button onclick="choosePay('visa')" style="background:#ff4d4d;color:white;">Visa Prepaid</button>
-  <button onclick="closeModals()" style="background:#333;">Cancel</button>
+  <button onclick="choosePay('robux')" style="background:#ff4d4d;color:white;margin:8px 0;">Robux</button>
+  <button onclick="choosePay('visa')" style="background:#ff4d4d;color:white;margin:8px 0;">Visa Prepaid</button>
+  <button onclick="closeModals()" style="background:#333;margin-top:10px;">Cancel</button>
 </div></div>
 
 <div id="step2" class="modal"><div class="panel">
-  <div class="step">2/4</div>
+  <div style="font-size:1.2rem;margin-bottom:15px;">2/4</div>
   <h2>Payment Link</h2>
-  <p id="payLink"></p>
-  <button onclick="goToStep3()" style="background:#ff4d4d;color:white;">I Purchased</button>
+  <p id="payLink" style="word-break:break-all;"></p>
+  <button onclick="goToStep3()" style="background:#ff4d4d;color:white;margin-top:15px;">I Purchased</button>
 </div></div>
 
 <div id="step3" class="modal"><div class="panel">
-  <div class="step">3/4</div>
+  <div style="font-size:1.2rem;margin-bottom:15px;">3/4</div>
   <h2>Your Roblox Username</h2>
   <input id="robloxUser" placeholder="Username">
-  <button onclick="goToStep4()" style="background:#ff4d4d;color:white;">Submit</button>
+  <button onclick="goToStep4()" style="background:#ff4d4d;color:white;margin-top:15px;">Submit</button>
 </div></div>
 
 <div id="step4" class="modal"><div class="panel">
-  <div class="step">4/4</div>
-  <h2>Proof</h2>
-  <input id="proof" placeholder="Screenshot link">
-  <button onclick="sendToOwner()" style="background:#ff4d4d;color:white;">Send to Owner</button>
+  <div style="font-size:1.2rem;margin-bottom:15px;">4/4</div>
+  <h2>Send Proof</h2>
+  <input id="proof" placeholder="Screenshot link or description">
+  <button onclick="sendToOwner()" style="background:#ff4d4d;color:white;margin-top:15px;">Send to Owner</button>
 </div></div>
 
 <script>
+let currentId = null;
+let currentName = "";
+
 // Owner button
-document.getElementById('ownerFab').onclick = function() {
+document.getElementById('ownerFab').onclick = () => {
   document.getElementById('ownerPanel').style.display = 'flex';
 };
 
 function unlock() {
   if (document.getElementById('pass').value === "favela23") {
     document.getElementById('mainPart').style.display = 'block';
+    document.getElementById('error').innerHTML = '';
   } else {
     document.getElementById('error').innerHTML = 'Wrong key';
   }
@@ -137,9 +148,7 @@ async function publish() {
   }
 
   const body = {
-    name,
-    desc: document.getElementById('desc').value,
-    price,
+    name, desc: document.getElementById('desc').value, price,
     robuxLink: document.getElementById('robuxLink').value,
     visaLink: document.getElementById('visaLink').value,
     quantity: parseInt(document.getElementById('quantity').value) || 1,
@@ -148,20 +157,20 @@ async function publish() {
   };
 
   try {
-    await fetch('/add-item', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    await fetch('/add-item', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
     msg.textContent = 'Forged!';
-    alert('Brainrot forged! Back to vault...');
+    alert('Brainrot added!');
     document.getElementById('ownerPanel').style.display = 'none';
     loadItems();
-  } catch (err) {
-    msg.textContent = 'Forge failed';
+  } catch (e) {
+    msg.textContent = 'Failed';
   } finally {
     btn.textContent = 'Forge Brainrot';
     btn.disabled = false;
   }
 }
 
-// Load shop
+// Load cards
 async function loadItems() {
   try {
     const res = await fetch('/items?_=' + Date.now());
@@ -173,38 +182,42 @@ async function loadItems() {
           <h3>${i.name}</h3>
           <p>${i.desc || ''}</p>
           <p class="price">${i.price.includes('$') ? 'Price: ' + i.price : 'Robux Price: ' + i.price}</p>
-          <button class="${i.quantity <= 0 ? 'in-buying-btn' : 'purchase-btn'}" onclick="${i.quantity <= 0 ? 'alert(\'Sorry, this brainrot is in buying. Try purchasing another or wait a little longer.\')' : 'startBuy(' + i.id + ', \\'' + i.name + '\\', \\'' + i.robuxLink + '\\', \\'' + i.visaLink + '\\')'}">
+          <button class="${i.quantity <= 0 ? 'in-buying-btn' : 'purchase-btn'}" 
+                  onclick="${i.quantity <= 0 ? `alert('Sorry, this brainrot is in buying. Try purchasing another or wait a little longer.')` : `startBuy(${i.id}, '${i.name.replace(/'/g,"\\'")}', '${i.robuxLink}', '${i.visaLink}')`}">
             ${i.quantity <= 0 ? 'In Buying' : 'Purchase'}
           </button>
           <div class="status" id="hold${i.id}">IN BUYING</div>
         </div>
       </div>
     `).join('');
-  } catch (err) {
-    document.getElementById('cards').innerHTML = '<p style="color:red">Error loading - refresh page</p>';
+  } catch (e) {
+    document.getElementById('cards').innerHTML = '<p style="color:red">Error loading. Refresh page.</p>';
   }
 }
 
 // Buy flow
 function startBuy(id, name, robuxL, visaL) {
   currentId = id;
+  currentName = name;
   document.getElementById(`hold${id}`).style.display = 'block';
   loadItems();
+
   document.getElementById('buyTitle').textContent = name;
   document.getElementById('step1').style.display = 'flex';
-  window.robuxL = robuxL;
-  window.visaL = visaL;
-  fetch(`/hold/${id}`, {method:'POST'});
 
-  setTimeout(() => {
+  window.currentRobuxLink = robuxL;
+  window.currentVisaLink = visaL;
+
+  setTimeout(() => { // auto release after 5 min
     document.getElementById(`hold${id}`).style.display = 'none';
     loadItems();
-  }, 5 * 60 * 1000);
+  }, 300000);
 }
 
 function choosePay(type) {
   closeModals();
-  document.getElementById('payLink').innerHTML = `Link: <a href="${type==='robux'?window.robuxL:window.visaL}" target="_blank">${type==='robux'?window.robuxL:window.visaL}</a>`;
+  const link = type === 'robux' ? window.currentRobuxLink : window.currentVisaLink;
+  document.getElementById('payLink').innerHTML = `Link: <a href="${link}" target="_blank" style="color:#ff4d4d;">${link || 'No link provided'}</a>`;
   document.getElementById('step2').style.display = 'flex';
 }
 
@@ -213,15 +226,31 @@ function goToStep3() {
   document.getElementById('step3').style.display = 'flex';
 }
 
-function nextStep() {
+function goToStep4() {
   closeModals();
   document.getElementById('step4').style.display = 'flex';
 }
 
-function sendToOwner() {
-  const username = document.getElementById('robloxUser')?.value || 'Unknown';
-  const proof = document.getElementById('proof')?.value || 'No proof';
-  alert('Sent to owner!\n\nItem: ' + document.getElementById('buyTitle').textContent + '\nUsername: ' + username + '\nProof: ' + proof);
+async function sendToOwner() {
+  const username = document.getElementById('robloxUser').value.trim() || 'Unknown';
+  const proof = document.getElementById('proof').value.trim() || 'No proof';
+
+  // Send purchase data to server (this will trigger Discord bot later)
+  try {
+    await fetch('/purchase-complete', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        id: currentId,
+        name: currentName,
+        username: username,
+        proof: proof,
+        type: 'pending'  // will be updated to robux or visa when you confirm
+      })
+    });
+  } catch (e) {}
+
+  alert(`✅ Sent to owner!\n\nBrainrot: ${currentName}\nUsername: ${username}\nProof: ${proof}`);
   closeModals();
   loadItems();
 }
