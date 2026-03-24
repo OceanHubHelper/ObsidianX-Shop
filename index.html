@@ -16,9 +16,10 @@
     .card .desc { margin:4px 0 10px; font-size:0.95rem; color:#bbb; }
     .price { color:#ff4d4d; font-weight:bold; font-size:1.1rem; margin:6px 0; }
     .status { position:absolute; top:10px; right:10px; background:#ff6600; color:white; padding:4px 12px; border-radius:6px; font-size:0.8rem; font-weight:bold; display:none; }
-    button { padding:14px; font-size:1.1rem; margin-top:12px; border:none; border-radius:8px; cursor:pointer; width:100%; font-weight:bold; }
+    button { padding:14px; font-size:1.1rem; margin-top:8px; border:none; border-radius:8px; cursor:pointer; width:100%; font-weight:bold; }
     .purchase-btn { background:#ff4d4d; color:white; }
     .in-buying-btn { background:#ff6600; color:white; }
+    .back-btn { background:#555; color:white; margin-top:10px; }
 
     #ownerFab {
       position:fixed; bottom:30px; right:30px; width:70px; height:70px;
@@ -73,13 +74,13 @@
   </div>
 </div>
 
-<!-- Buy Steps (same as before) -->
+<!-- Buy Steps with Back buttons -->
 <div id="step1" class="modal"><div class="panel">
   <div style="font-size:1.2rem;margin-bottom:15px;">1/4</div>
   <h2 id="buyTitle"></h2>
   <button onclick="choosePay('robux')" style="background:#ff4d4d;color:white;margin:8px 0;">Robux</button>
   <button onclick="choosePay('visa')" style="background:#ff4d4d;color:white;margin:8px 0;">Visa Prepaid</button>
-  <button onclick="closeModals()" style="background:#333;margin-top:10px;">Cancel</button>
+  <button onclick="closeModals()" class="back-btn">Back</button>
 </div></div>
 
 <div id="step2" class="modal"><div class="panel">
@@ -87,6 +88,7 @@
   <h2>Payment Link</h2>
   <p id="payLink" style="word-break:break-all;"></p>
   <button onclick="goToStep3()" style="background:#ff4d4d;color:white;margin-top:15px;">I Purchased</button>
+  <button onclick="closeModals()" class="back-btn">Back</button>
 </div></div>
 
 <div id="step3" class="modal"><div class="panel">
@@ -94,6 +96,7 @@
   <h2>Your Roblox Username</h2>
   <input id="robloxUser" placeholder="Username">
   <button onclick="goToStep4()" style="background:#ff4d4d;color:white;margin-top:15px;">Submit</button>
+  <button onclick="closeModals()" class="back-btn">Back</button>
 </div></div>
 
 <div id="step4" class="modal"><div class="panel">
@@ -101,6 +104,7 @@
   <h2>Send Proof</h2>
   <input id="proof" placeholder="Screenshot link or description">
   <button onclick="sendToOwner()" style="background:#ff4d4d;color:white;margin-top:15px;">Send to Owner</button>
+  <button onclick="closeModals()" class="back-btn">Back</button>
 </div></div>
 
 <script>
@@ -149,10 +153,8 @@ async function publish() {
   }
 
   const body = {
-    name,
-    desc: document.getElementById('desc').value,
-    moneyPrice,
-    robuxPrice,
+    name, desc: document.getElementById('desc').value,
+    moneyPrice, robuxPrice,
     robuxLink: document.getElementById('robuxLink').value,
     visaLink: document.getElementById('visaLink').value,
     quantity: parseInt(document.getElementById('quantity').value) || 1,
@@ -174,7 +176,7 @@ async function publish() {
   }
 }
 
-// Load cards - clean prices
+// Load cards
 async function loadItems() {
   try {
     const res = await fetch('/items?_=' + Date.now());
@@ -200,7 +202,7 @@ async function loadItems() {
   }
 }
 
-// Buy flow (unchanged)
+// Buy flow
 function startBuy(id, name, robuxL, visaL) {
   currentId = id;
   currentName = name;
