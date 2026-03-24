@@ -5,139 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ObsidianX Brainrot Store</title>
   <style>
-    body { 
-      background:#0a0a0a; 
-      color:#e0e0e0; 
-      font-family:Arial; 
-      margin:0; 
-      padding:20px; 
-    }
-    h1 { 
-      color:#ff4d4d; 
-      text-align:center; 
-      margin:20px 0; 
-      font-size:2.8rem; 
-      text-shadow:0 0 15px #ff3300; 
-    }
-    .store { 
-      display:grid; 
-      grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); 
-      gap:15px; 
-      max-width:1200px; 
-      margin:0 auto; 
-    }
-    .card { 
-      background:#111; 
-      border:2px solid #333; 
-      border-radius:12px; 
-      overflow:hidden; 
-      position:relative; 
-      transition:0.4s; 
-    }
-    .card:hover { 
-      transform:translateY(-8px); 
-      border-color:#ff4d4d; 
-      box-shadow:0 12px 35px rgba(255,77,77,0.4); 
-    }
-    .card img { 
-      width:100%; 
-      height:160px; 
-      object-fit:cover; 
-    }
-    .card-content { 
-      padding:12px; 
-      text-align:left; 
-    }
-    .card h3 { 
-      margin:0 0 8px; 
-      font-size:1.25rem; 
-      color:#fff; 
-      font-weight:bold; 
-    }
-    .card .desc { 
-      margin:4px 0 10px; 
-      font-size:0.95rem; 
-      color:#bbb; 
-    }
-    .price { 
-      color:#ff4d4d; 
-      font-weight:bold; 
-      font-size:1.1rem; 
-      margin:6px 0; 
-    }
-    .status { 
-      position:absolute; 
-      top:10px; 
-      right:10px; 
-      background:#ff6600; 
-      color:white; 
-      padding:4px 12px; 
-      border-radius:6px; 
-      font-size:0.8rem; 
-      font-weight:bold; 
-      display:none; 
-    }
-    button { 
-      padding:14px; 
-      font-size:1.1rem; 
-      margin-top:12px; 
-      border:none; 
-      border-radius:8px; 
-      cursor:pointer; 
-      width:100%; 
-      font-weight:bold; 
-    }
+    body { background:#0a0a0a; color:#e0e0e0; font-family:Arial; margin:0; padding:20px; }
+    h1 { color:#ff4d4d; text-align:center; margin:20px 0; font-size:2.8rem; text-shadow:0 0 15px #ff3300; }
+    .store { display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:15px; max-width:1200px; margin:0 auto; }
+    .card { background:#111; border:2px solid #333; border-radius:12px; overflow:hidden; position:relative; transition:0.4s; }
+    .card:hover { transform:translateY(-8px); border-color:#ff4d4d; box-shadow:0 12px 35px rgba(255,77,77,0.4); }
+    .card img { width:100%; height:160px; object-fit:cover; }
+    .card-content { padding:12px; text-align:left; }
+    .card h3 { margin:0 0 8px; font-size:1.25rem; color:#fff; font-weight:bold; }
+    .card .desc { margin:4px 0 10px; font-size:0.95rem; color:#bbb; }
+    .price { color:#ff4d4d; font-weight:bold; font-size:1.1rem; margin:6px 0; }
+    .status { position:absolute; top:10px; right:10px; background:#ff6600; color:white; padding:4px 12px; border-radius:6px; font-size:0.8rem; font-weight:bold; display:none; }
+    button { padding:14px; font-size:1.1rem; margin-top:12px; border:none; border-radius:8px; cursor:pointer; width:100%; font-weight:bold; }
     .purchase-btn { background:#ff4d4d; color:white; }
     .in-buying-btn { background:#ff6600; color:white; }
 
     #ownerFab {
-      position:fixed; 
-      bottom:30px; 
-      right:30px; 
-      width:70px; 
-      height:70px;
-      background:#ff4d4d; 
-      color:white; 
-      font-size:2.2rem; 
-      border:none;
-      border-radius:12px; 
-      box-shadow:0 0 25px #ff3300; 
-      z-index:9999;
-      display:flex; 
-      align-items:center; 
-      justify-content:center; 
-      cursor:pointer;
+      position:fixed; bottom:30px; right:30px; width:70px; height:70px;
+      background:#ff4d4d; color:white; font-size:2.2rem; border:none;
+      border-radius:12px; box-shadow:0 0 25px #ff3300; z-index:9999;
+      display:flex; align-items:center; justify-content:center; cursor:pointer;
     }
 
-    .modal { 
-      display:none; 
-      position:fixed; 
-      inset:0; 
-      background:rgba(0,0,0,0.95); 
-      z-index:9998; 
-      align-items:center; 
-      justify-content:center; 
-      padding:10px; 
-    }
-    .panel { 
-      background:#111; 
-      border:3px solid #ff4d4d; 
-      border-radius:12px; 
-      padding:25px; 
-      width:100%; 
-      max-width:420px; 
-      max-height:85vh; 
-      overflow-y:auto; 
-    }
-    input, select { 
-      width:100%; 
-      padding:10px; 
-      margin:8px 0; 
-      background:#1a1a1a; 
-      border:1px solid #ff4d4d; 
-      color:#e0e0e0; 
-      border-radius:6px; 
-    }
+    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:9998; align-items:center; justify-content:center; padding:10px; }
+    .panel { background:#111; border:3px solid #ff4d4d; border-radius:12px; padding:25px; width:100%; max-width:420px; max-height:85vh; overflow-y:auto; }
+    input, select { width:100%; padding:10px; margin:8px 0; background:#1a1a1a; border:1px solid #ff4d4d; color:#e0e0e0; border-radius:6px; }
   </style>
 </head>
 <body>
@@ -181,7 +73,7 @@
   </div>
 </div>
 
-<!-- Buy Steps -->
+<!-- Buy Steps (same as before) -->
 <div id="step1" class="modal"><div class="panel">
   <div style="font-size:1.2rem;margin-bottom:15px;">1/4</div>
   <h2 id="buyTitle"></h2>
@@ -216,9 +108,7 @@ let currentId = null;
 let currentName = "";
 
 // Owner button
-document.getElementById('ownerFab').onclick = () => {
-  document.getElementById('ownerPanel').style.display = 'flex';
-};
+document.getElementById('ownerFab').onclick = () => document.getElementById('ownerPanel').style.display = 'flex';
 
 function unlock() {
   if (document.getElementById('pass').value === "favela23") {
@@ -284,7 +174,7 @@ async function publish() {
   }
 }
 
-// Load cards - clean prices exactly as you want
+// Load cards - clean prices
 async function loadItems() {
   try {
     const res = await fetch('/items?_=' + Date.now());
@@ -310,7 +200,7 @@ async function loadItems() {
   }
 }
 
-// Buy flow
+// Buy flow (unchanged)
 function startBuy(id, name, robuxL, visaL) {
   currentId = id;
   currentName = name;
