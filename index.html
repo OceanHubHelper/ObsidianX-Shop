@@ -63,7 +63,7 @@
       color:#ff4d4d; 
       font-weight:bold; 
       font-size:1.1rem; 
-      margin:4px 0; 
+      margin:6px 0; 
     }
     .status { 
       position:absolute; 
@@ -160,7 +160,7 @@
 
     <div id="mainPart" style="display:none;margin-top:20px;">
       <input id="name" placeholder="Brainrot Name" required>
-      <input id="desc" placeholder="Description (e.g. Lava, 400m/s)">
+      <input id="desc" placeholder="Description (e.g. Lava)">
       <input id="moneyPrice" placeholder="Cost $" required>
       <input id="robuxPrice" placeholder="Robux Price (e.g. 599)" required>
       <input id="robuxLink" placeholder="Robux Link">
@@ -284,7 +284,7 @@ async function publish() {
   }
 }
 
-// Load cards - clean prices like your screenshot
+// Load cards - clean prices exactly as you want
 async function loadItems() {
   try {
     const res = await fetch('/items?_=' + Date.now());
@@ -295,7 +295,8 @@ async function loadItems() {
         <div class="card-content">
           <h3>${i.name}</h3>
           <p class="desc">${i.desc || ''}</p>
-          <p class="price">Price: $${i.moneyPrice} / ${i.robuxPrice} Robux</p>
+          <p class="price">Price: $${i.moneyPrice}</p>
+          <p class="price">Robux: ${i.robuxPrice}</p>
           <button class="${i.quantity <= 0 ? 'in-buying-btn' : 'purchase-btn'}" 
                   onclick="${i.quantity <= 0 ? `alert('Sorry, this brainrot is in buying. Try purchasing another or wait a little longer.')` : `startBuy(${i.id}, '${i.name.replace(/'/g,"\\'")}', '${i.robuxLink}', '${i.visaLink}')`}">
             ${i.quantity <= 0 ? 'In Buying' : 'Purchase'}
