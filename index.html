@@ -127,7 +127,7 @@
       border-radius: 12px; 
       padding: 25px; 
       width: 100%; 
-      max-width: 440px; 
+      max-width: 460px; 
       max-height: 85vh; 
       overflow-y: auto; 
     }
@@ -181,7 +181,7 @@
     <button onclick="document.getElementById('ownerPanel').style.display='none'" style="float:right;background:#ff1a1a;color:white;border:none;padding:8px 14px;border-radius:50%;">×</button>
     <h2 style="color:#ff4d4d;">Owner Vault Access</h2>
     
-    <!-- Login -->
+    <!-- Login Section -->
     <div id="loginSection">
       <input id="pass" type="password" placeholder="Access Key">
       <button onclick="unlock()" style="background:#ff4d4d;color:white;margin-top:10px;">Unlock</button>
@@ -220,7 +220,7 @@
 
       <!-- Delete Tab -->
       <div id="deleteTab" style="display:none;">
-        <div id="deleteList" style="margin-top:10px;"></div>
+        <div id="deleteList"></div>
       </div>
     </div>
   </div>
@@ -297,7 +297,7 @@ function switchTab(tab) {
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === tab));
 }
 
-// Publish
+// Publish with validation
 async function publish() {
   const btn = document.getElementById('publishBtn');
   const msg = document.getElementById('statusMsg');
@@ -310,7 +310,7 @@ async function publish() {
   const robuxPrice = document.getElementById('robuxPrice').value.trim();
 
   if (!name || !moneyPrice || !robuxPrice) {
-    msg.textContent = 'Name, Cost $, and Robux Price required';
+    msg.textContent = 'Name, Cost $, and Robux Price are required!';
     btn.textContent = 'Forge Brainrot';
     btn.disabled = false;
     return;
@@ -339,11 +339,11 @@ async function publish() {
   try {
     await fetch('/add-item', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
     msg.textContent = 'Forged!';
-    alert('Brainrot added!');
+    alert('Brainrot added successfully!');
     document.getElementById('ownerPanel').style.display = 'none';
     loadItems();
   } catch (e) {
-    msg.textContent = 'Failed';
+    msg.textContent = 'Failed to forge';
   } finally {
     btn.textContent = 'Forge Brainrot';
     btn.disabled = false;
