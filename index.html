@@ -36,6 +36,7 @@
     .tabs { display:flex; margin-bottom:20px; border-bottom:2px solid #333; }
     .tab { flex:1; padding:14px; text-align:center; cursor:pointer; background:#222; border-radius:8px 8px 0 0; }
     .tab.active { background:#ff4d4d; color:white; font-weight:bold; }
+    .item-box { border:1px solid #444; padding:12px; margin-bottom:12px; border-radius:8px; }
   </style>
 </head>
 <body>
@@ -53,14 +54,14 @@
     <button onclick="document.getElementById('ownerPanel').style.display='none'" style="float:right;background:#ff1a1a;color:white;border:none;padding:8px 14px;border-radius:50%;">×</button>
     <h2 style="color:#ff4d4d;">Owner Vault Access</h2>
     
-    <!-- Login Section -->
+    <!-- Login -->
     <div id="loginSection">
       <input id="pass" type="password" placeholder="Access Key">
       <button onclick="unlock()" style="background:#ff4d4d;color:white;margin-top:10px;">Unlock</button>
       <div id="error" style="color:#ff3366;margin:10px 0;"></div>
     </div>
 
-    <!-- Main Content (hidden until login) -->
+    <!-- Main Content -->
     <div id="mainPart" style="display:none;">
       <div class="tabs">
         <div class="tab active" onclick="switchTab(0)">Add Brainrot</div>
@@ -103,7 +104,7 @@
         <div id="transactionDetails" style="margin-top:15px;"></div>
       </div>
 
-      <!-- Manage Stock Tab -->
+      <!-- Manage Stock Tab (like Delete tab but only manage) -->
       <div id="stockTab" style="display:none;">
         <div id="stockList"></div>
       </div>
@@ -185,7 +186,7 @@ function switchTab(tab) {
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === tab));
 }
 
-// Publish with required fields
+// Publish
 async function publish() {
   const btn = document.getElementById('publishBtn');
   const msg = document.getElementById('statusMsg');
@@ -238,7 +239,7 @@ async function publish() {
   }
 }
 
-// Load shop cards
+// Load shop
 async function loadItems() {
   try {
     const res = await fetch('/items?_=' + Date.now());
@@ -264,7 +265,7 @@ async function loadItems() {
   }
 }
 
-// Load delete list
+// Load Delete Tab
 async function loadDeleteList() {
   try {
     const res = await fetch('/items?_=' + Date.now());
@@ -272,7 +273,7 @@ async function loadDeleteList() {
     let html = '';
     data.forEach(i => {
       html += `
-        <div style="border:1px solid #444; padding:12px; margin-bottom:12px; border-radius:8px;">
+        <div class="item-box">
           <img src="${i.img}" style="width:100%; height:120px; object-fit:cover; border-radius:6px;">
           <h3>${i.name}</h3>
           <p>${i.desc || ''}</p>
@@ -300,17 +301,7 @@ async function deleteItem(id) {
   }
 }
 
-// Search receipt (placeholder - you can expand later)
-function searchReceipt() {
-  const receipt = document.getElementById('searchReceipt').value.trim();
-  if (!receipt) return alert('Enter a receipt number');
-  document.getElementById('transactionDetails').innerHTML = `
-    <p><strong>Receipt #${receipt}</strong></p>
-    <p>Details will load here when server is updated.</p>
-  `;
-}
-
-// Load Manage Stock
+// Load Manage Stock Tab (same style as Delete)
 async function loadStockList() {
   try {
     const res = await fetch('/items?_=' + Date.now());
@@ -319,8 +310,11 @@ async function loadStockList() {
     data.forEach(i => {
       if (i.quantity <= 0) {
         html += `
-          <div style="border:1px solid #444; padding:12px; margin-bottom:12px; border-radius:8px;">
+          <div class="item-box">
+            <img src="${i.img}" style="width:100%; height:120px; object-fit:cover; border-radius:6px;">
             <h3>${i.name}</h3>
+            <p>${i.desc || ''}</p>
+            <p>Price: $${i.moneyPrice} | Robux: ${i.robuxPrice}</p>
             <p>Status: In Buying</p>
             <button onclick="setStatus(${i.id}, -1)" style="background:#ff1a1a;color:white;margin:5px;">Compromised</button>
             <button onclick="setStatus(${i.id}, 0)" style="background:#ffaa00;color:white;margin:5px;">Keep In Buying</button>
@@ -329,7 +323,7 @@ async function loadStockList() {
         `;
       }
     });
-    document.getElementById('stockList').innerHTML = html || '<p>No brainrots in buying.</p>';
+    document.getElementById('stockList').innerHTML = html || '<p>No brainrots currently in buying.</p>';
   } catch (e) {
     document.getElementById('stockList').innerHTML = '<p>Error loading stock.</p>';
   }
@@ -355,7 +349,23 @@ async function setStatus(id, status) {
   }
 }
 
-// Buy flow
+// Transactions (search receipt)
+function searchReceipt() {
+  const receipt = document.getElementById('searchReceipt').value.trim();
+  if (!receipt) return alert('Enter a receipt number');
+  document.getElementById('transactionDetails').innerHTML = `
+    <p><strong>Receipt #${receipt}</strong></p>
+    <button onclick="copyReceipt('${receipt}')" style="background:#00ff88;color:black;">Copy Receipt Number</button>
+    <p>Full details will load here when server is ready.</p>
+  `;
+}
+
+function copyReceipt(receipt) {
+  navigator.clipboard.writeText(receipt);
+  alert('Receipt number copied to clipboard!');
+}
+
+// Buy flow (no receipt shown to buyer)
 function startBuy(id, name, robuxL, visaL) {
   currentId = id;
   currentName = name;
@@ -442,7 +452,7 @@ async function sendToOwner() {
     console.log("⚠️ Bot webhook failed");
   }
 
-  alert(`✅ Purchase Complete!\n\nReceipt Number: ${receiptNumber}\n\nSave this number.`);
+  alert(`✅ Sent to owner! The purchase has been recorded.`);
   closeModals();
   loadItems();
 }
