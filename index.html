@@ -74,7 +74,7 @@
   </div>
 </div>
 
-<!-- Buy Steps with Back buttons -->
+<!-- Buy Steps -->
 <div id="step1" class="modal"><div class="panel">
   <div style="font-size:1.2rem;margin-bottom:15px;">1/4</div>
   <h2 id="buyTitle"></h2>
@@ -239,12 +239,15 @@ async function sendToOwner() {
   const proof = document.getElementById('proof').value.trim() || 'No proof';
 
   try {
-    await fetch('/purchase-complete', {
+    await fetch('https://obsidian-bot-production-ea36.up.railway.app/purchase-complete', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ id: currentId, name: currentName, username, proof })
     });
-  } catch (e) {}
+    console.log("✅ Sent to bot successfully");
+  } catch (e) {
+    console.log("⚠️ Bot webhook failed, but purchase saved locally");
+  }
 
   alert(`✅ Sent to owner!\n\nBrainrot: ${currentName}\nUsername: ${username}\nProof: ${proof}`);
   closeModals();
