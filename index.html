@@ -36,7 +36,6 @@
     .tabs { display:flex; margin-bottom:20px; border-bottom:2px solid #333; }
     .tab { flex:1; padding:14px; text-align:center; cursor:pointer; background:#222; border-radius:8px 8px 0 0; }
     .tab.active { background:#ff4d4d; color:white; font-weight:bold; }
-    .stock-item { border:1px solid #444; padding:12px; margin-bottom:12px; border-radius:8px; }
   </style>
 </head>
 <body>
@@ -54,19 +53,20 @@
     <button onclick="document.getElementById('ownerPanel').style.display='none'" style="float:right;background:#ff1a1a;color:white;border:none;padding:8px 14px;border-radius:50%;">×</button>
     <h2 style="color:#ff4d4d;">Owner Vault Access</h2>
     
-    <!-- Login -->
+    <!-- Login Section -->
     <div id="loginSection">
       <input id="pass" type="password" placeholder="Access Key">
       <button onclick="unlock()" style="background:#ff4d4d;color:white;margin-top:10px;">Unlock</button>
       <div id="error" style="color:#ff3366;margin:10px 0;"></div>
     </div>
 
-    <!-- Main Content -->
+    <!-- Main Content (hidden until login) -->
     <div id="mainPart" style="display:none;">
       <div class="tabs">
         <div class="tab active" onclick="switchTab(0)">Add Brainrot</div>
         <div class="tab" onclick="switchTab(1)">Delete Brainrot</div>
-        <div class="tab" onclick="switchTab(2)">Manage Stock</div>
+        <div class="tab" onclick="switchTab(2)">Transactions</div>
+        <div class="tab" onclick="switchTab(3)">Manage Stock</div>
       </div>
 
       <!-- Add Tab -->
@@ -94,6 +94,13 @@
       <!-- Delete Tab -->
       <div id="deleteTab" style="display:none;">
         <div id="deleteList"></div>
+      </div>
+
+      <!-- Transactions Tab -->
+      <div id="transactionsTab" style="display:none;">
+        <input id="searchReceipt" placeholder="Search by Receipt Number" style="margin-bottom:10px;">
+        <button onclick="searchReceipt()" style="background:#ff4d4d;color:white;">Search</button>
+        <div id="transactionDetails" style="margin-top:15px;"></div>
       </div>
 
       <!-- Manage Stock Tab -->
@@ -173,7 +180,8 @@ function unlock() {
 function switchTab(tab) {
   document.getElementById('addTab').style.display = tab === 0 ? 'block' : 'none';
   document.getElementById('deleteTab').style.display = tab === 1 ? 'block' : 'none';
-  document.getElementById('stockTab').style.display = tab === 2 ? 'block' : 'none';
+  document.getElementById('transactionsTab').style.display = tab === 2 ? 'block' : 'none';
+  document.getElementById('stockTab').style.display = tab === 3 ? 'block' : 'none';
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === tab));
 }
 
@@ -292,7 +300,17 @@ async function deleteItem(id) {
   }
 }
 
-// Load stock management tab
+// Search receipt (placeholder - you can expand later)
+function searchReceipt() {
+  const receipt = document.getElementById('searchReceipt').value.trim();
+  if (!receipt) return alert('Enter a receipt number');
+  document.getElementById('transactionDetails').innerHTML = `
+    <p><strong>Receipt #${receipt}</strong></p>
+    <p>Details will load here when server is updated.</p>
+  `;
+}
+
+// Load Manage Stock
 async function loadStockList() {
   try {
     const res = await fetch('/items?_=' + Date.now());
@@ -301,7 +319,7 @@ async function loadStockList() {
     data.forEach(i => {
       if (i.quantity <= 0) {
         html += `
-          <div class="stock-item">
+          <div style="border:1px solid #444; padding:12px; margin-bottom:12px; border-radius:8px;">
             <h3>${i.name}</h3>
             <p>Status: In Buying</p>
             <button onclick="setStatus(${i.id}, -1)" style="background:#ff1a1a;color:white;margin:5px;">Compromised</button>
@@ -317,13 +335,17 @@ async function loadStockList() {
   }
 }
 
-// Set status (Compromised / Keep / Available)
+// Set status
 async function setStatus(id, status) {
   try {
     if (status === -1) {
       await fetch(`/delete/${id}`, { method: 'DELETE' });
     } else {
-      await fetch(`/set-status/${id}`, { method: 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({quantity: status}) });
+      await fetch(`/set-status/${id}`, { 
+        method: 'POST', 
+        headers:{'Content-Type':'application/json'}, 
+        body:JSON.stringify({quantity: status}) 
+      });
     }
     alert('Status updated!');
     loadStockList();
@@ -370,11 +392,13 @@ function goToStep4() {
 
 function goToStep5() {
   const file = document.getElementById('screenshot').files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = () => screenshotData = reader.result;
-    reader.readAsDataURL(file);
+  if (!file) {
+    alert('Please upload a screenshot');
+    return;
   }
+  const reader = new FileReader();
+  reader.onload = () => screenshotData = reader.result;
+  reader.readAsDataURL(file);
   closeModals();
   if (currentPaymentType === 'visa') {
     document.getElementById('step5').style.display = 'flex';
@@ -414,7 +438,9 @@ async function sendToOwner() {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload)
     });
-  } catch (e) {}
+  } catch (e) {
+    console.log("⚠️ Bot webhook failed");
+  }
 
   alert(`✅ Purchase Complete!\n\nReceipt Number: ${receiptNumber}\n\nSave this number.`);
   closeModals();
