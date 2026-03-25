@@ -6,14 +6,11 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
 
-const PORT = process.env.PORT || 3000;   // ← Railway uses $PORT
+const PORT = process.env.PORT || 3000;
 
 const db = new sqlite3.Database("/data/brainrots.db", (err) => {
-  if (err) {
-    console.error("❌ Database connection failed:", err.message);
-  } else {
-    console.log("✅ Connected to SQLite database at /data/brainrots.db");
-  }
+  if (err) console.error("❌ DB Error:", err.message);
+  else console.log("✅ Connected to SQLite");
 });
 
 db.serialize(() => {
@@ -29,18 +26,17 @@ db.serialize(() => {
     rarity TEXT,
     img TEXT
   )`, (err) => {
-    if (err) console.error("❌ Table error:", err);
-    else console.log("✅ Items table ready");
+    if (err) console.error("Table error:", err);
+    else console.log("✅ Table ready");
   });
 });
 
 app.get("/items", (req, res) => {
   db.all("SELECT * FROM items", [], (err, rows) => {
     if (err) {
-      console.error("Items fetch error:", err);
+      console.error("Fetch error:", err);
       return res.json([]);
     }
-    console.log(`📦 Sending ${rows.length} brainrots to client`);
     res.json(rows || []);
   });
 });
@@ -52,23 +48,34 @@ app.post("/add-item", (req, res) => {
     [name, desc, moneyPrice, robuxPrice, robuxLink, visaLink, quantity || 1, rarity, img],
     function(err) {
       if (err) {
-        console.error("Add item error:", err);
-        return res.status(500).json({ error: err.message });
+        console.error("Add error:", err);
+        return res.status(500).json({error: err.message});
       }
-      console.log("✅ Brainrot saved:", name);
-      res.json({ success: true });
+      console.log("✅ Added:", name);
+      res.json({success: true});
     }
   );
 });
 
 app.post("/hold/:id", (req, res) => {
   db.run("UPDATE items SET quantity = 0 WHERE id = ?", [req.params.id]);
-  res.json({ success: true });
+  res.json({success: true});
+});
+
+app.delete("/delete/:id", (req, res) => {
+  db.run("DELETE FROM items WHERE id = ?", [req.params.id], (err) => {
+    if (err) {
+      console.error("Delete error:", err);
+      return res.status(500).json({error: err.message});
+    }
+    console.log("✅ Deleted item ID:", req.params.id);
+    res.json({success: true});
+  });
 });
 
 app.post("/purchase-complete", (req, res) => {
-  console.log("📩 Purchase data from shop:", req.body);
-  res.json({ success: true });
+  console.log("📩 Purchase received:", req.body);
+  res.json({success: true});
 });
 
 app.listen(PORT, () => {
