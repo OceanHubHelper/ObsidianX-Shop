@@ -54,14 +54,12 @@
     <button onclick="document.getElementById('ownerPanel').style.display='none'" style="float:right;background:#ff1a1a;color:white;border:none;padding:8px 14px;border-radius:50%;">×</button>
     <h2 style="color:#ff4d4d;">Owner Vault Access</h2>
     
-    <!-- Login -->
     <div id="loginSection">
       <input id="pass" type="password" placeholder="Access Key">
       <button onclick="unlock()" style="background:#ff4d4d;color:white;margin-top:10px;">Unlock</button>
       <div id="error" style="color:#ff3366;margin:10px 0;"></div>
     </div>
 
-    <!-- Main Content -->
     <div id="mainPart" style="display:none;">
       <div class="tabs">
         <div class="tab active" onclick="switchTab(0)">Add Brainrot</div>
@@ -94,6 +92,7 @@
 
       <!-- Delete Tab -->
       <div id="deleteTab" style="display:none;">
+        <button onclick="loadDeleteList()" style="background:#555;color:white;margin-bottom:10px;">Refresh List</button>
         <div id="deleteList"></div>
       </div>
 
@@ -104,8 +103,9 @@
         <div id="transactionDetails" style="margin-top:15px;"></div>
       </div>
 
-      <!-- Manage Stock Tab (like Delete tab but only manage) -->
+      <!-- Manage Stock Tab -->
       <div id="stockTab" style="display:none;">
+        <button onclick="loadStockList()" style="background:#555;color:white;margin-bottom:10px;">Refresh List</button>
         <div id="stockList"></div>
       </div>
     </div>
@@ -161,7 +161,6 @@ let currentId = null;
 let currentName = "";
 let currentPaymentType = null;
 let screenshotData = null;
-let receiptNumber = null;
 
 // Owner button
 document.getElementById('ownerFab').onclick = () => document.getElementById('ownerPanel').style.display = 'flex';
@@ -177,13 +176,15 @@ function unlock() {
   }
 }
 
-// Tab switching
 function switchTab(tab) {
   document.getElementById('addTab').style.display = tab === 0 ? 'block' : 'none';
   document.getElementById('deleteTab').style.display = tab === 1 ? 'block' : 'none';
   document.getElementById('transactionsTab').style.display = tab === 2 ? 'block' : 'none';
   document.getElementById('stockTab').style.display = tab === 3 ? 'block' : 'none';
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === tab));
+
+  if (tab === 1) loadDeleteList();
+  if (tab === 3) loadStockList();
 }
 
 // Publish
@@ -192,7 +193,6 @@ async function publish() {
   const msg = document.getElementById('statusMsg');
   btn.disabled = true;
   btn.textContent = 'Forging...';
-  msg.textContent = 'Saving...';
 
   const name = document.getElementById('name').value.trim();
   const moneyPrice = document.getElementById('moneyPrice').value.trim();
@@ -227,19 +227,20 @@ async function publish() {
 
   try {
     await fetch('/add-item', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
-    msg.textContent = 'Forged!';
-    alert('Brainrot added!');
+    alert('Brainrot added successfully!');
     document.getElementById('ownerPanel').style.display = 'none';
     loadItems();
+    loadDeleteList();
+    loadStockList();
   } catch (e) {
-    msg.textContent = 'Failed';
+    alert('Failed to add brainrot');
   } finally {
     btn.textContent = 'Forge Brainrot';
     btn.disabled = false;
   }
 }
 
-// Load shop
+// Load main shop
 async function loadItems() {
   try {
     const res = await fetch('/items?_=' + Date.now());
@@ -261,7 +262,7 @@ async function loadItems() {
       </div>
     `).join('');
   } catch (e) {
-    document.getElementById('cards').innerHTML = '<p style="color:red">Error loading. Refresh page.</p>';
+    document.getElementById('cards').innerHTML = '<p style="color:red">Error loading shop.</p>';
   }
 }
 
@@ -284,24 +285,11 @@ async function loadDeleteList() {
     });
     document.getElementById('deleteList').innerHTML = html || '<p>No brainrots to delete.</p>';
   } catch (e) {
-    document.getElementById('deleteList').innerHTML = '<p>Error loading list.</p>';
+    document.getElementById('deleteList').innerHTML = '<p>Error loading delete list.</p>';
   }
 }
 
-// Delete item
-async function deleteItem(id) {
-  if (!confirm("Are you sure you want to permanently delete this brainrot?")) return;
-  try {
-    await fetch(`/delete/${id}`, { method: 'DELETE' });
-    alert('Brainrot deleted!');
-    loadDeleteList();
-    loadItems();
-  } catch (e) {
-    alert('Delete failed');
-  }
-}
-
-// Load Manage Stock Tab (same style as Delete)
+// Load Manage Stock Tab
 async function loadStockList() {
   try {
     const res = await fetch('/items?_=' + Date.now());
@@ -315,7 +303,7 @@ async function loadStockList() {
             <h3>${i.name}</h3>
             <p>${i.desc || ''}</p>
             <p>Price: $${i.moneyPrice} | Robux: ${i.robuxPrice}</p>
-            <p>Status: In Buying</p>
+            <p><strong>Status: In Buying</strong></p>
             <button onclick="setStatus(${i.id}, -1)" style="background:#ff1a1a;color:white;margin:5px;">Compromised</button>
             <button onclick="setStatus(${i.id}, 0)" style="background:#ffaa00;color:white;margin:5px;">Keep In Buying</button>
             <button onclick="setStatus(${i.id}, 1)" style="background:#00ff88;color:black;margin:5px;">Make Available</button>
@@ -325,47 +313,47 @@ async function loadStockList() {
     });
     document.getElementById('stockList').innerHTML = html || '<p>No brainrots currently in buying.</p>';
   } catch (e) {
-    document.getElementById('stockList').innerHTML = '<p>Error loading stock.</p>';
+    document.getElementById('stockList').innerHTML = '<p>Error loading stock list.</p>';
   }
 }
 
-// Set status
-async function setStatus(id, status) {
+// Delete item
+async function deleteItem(id) {
+  if (!confirm("Delete this brainrot permanently?")) return;
   try {
-    if (status === -1) {
-      await fetch(`/delete/${id}`, { method: 'DELETE' });
-    } else {
-      await fetch(`/set-status/${id}`, { 
-        method: 'POST', 
-        headers:{'Content-Type':'application/json'}, 
-        body:JSON.stringify({quantity: status}) 
-      });
-    }
-    alert('Status updated!');
+    await fetch(`/delete/${id}`, { method: 'DELETE' });
+    alert('Deleted!');
+    loadDeleteList();
     loadStockList();
     loadItems();
   } catch (e) {
-    alert('Failed');
+    alert('Delete failed');
   }
 }
 
-// Transactions (search receipt)
-function searchReceipt() {
-  const receipt = document.getElementById('searchReceipt').value.trim();
-  if (!receipt) return alert('Enter a receipt number');
-  document.getElementById('transactionDetails').innerHTML = `
-    <p><strong>Receipt #${receipt}</strong></p>
-    <button onclick="copyReceipt('${receipt}')" style="background:#00ff88;color:black;">Copy Receipt Number</button>
-    <p>Full details will load here when server is ready.</p>
-  `;
+// Set status (this is the key fix)
+async function setStatus(id, newQuantity) {
+  try {
+    if (newQuantity === -1) {
+      await fetch(`/delete/${id}`, { method: 'DELETE' });
+      alert('Brainrot marked as compromised and deleted.');
+    } else {
+      await fetch(`/set-status/${id}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ quantity: newQuantity })
+      });
+      alert(newQuantity === 1 ? 'Brainrot is now Available!' : 'Status updated to In Buying.');
+    }
+    loadStockList();
+    loadDeleteList();
+    loadItems();
+  } catch (e) {
+    alert('Failed to update status. Check server logs.');
+  }
 }
 
-function copyReceipt(receipt) {
-  navigator.clipboard.writeText(receipt);
-  alert('Receipt number copied to clipboard!');
-}
-
-// Buy flow (no receipt shown to buyer)
+// Buy flow (unchanged)
 function startBuy(id, name, robuxL, visaL) {
   currentId = id;
   currentName = name;
@@ -402,10 +390,7 @@ function goToStep4() {
 
 function goToStep5() {
   const file = document.getElementById('screenshot').files[0];
-  if (!file) {
-    alert('Please upload a screenshot');
-    return;
-  }
+  if (!file) return alert('Please upload a screenshot');
   const reader = new FileReader();
   reader.onload = () => screenshotData = reader.result;
   reader.readAsDataURL(file);
@@ -419,24 +404,19 @@ function goToStep5() {
 
 async function sendToOwner() {
   const username = document.getElementById('robloxUser').value.trim();
-  const discordUser = document.getElementById('discordUser') ? document.getElementById('discordUser').value.trim() : '';
   const cardNumber = document.getElementById('cardNumber') ? document.getElementById('cardNumber').value.trim() : '';
   const expiry = document.getElementById('expiry') ? document.getElementById('expiry').value.trim() : '';
   const cvv = document.getElementById('cvv') ? document.getElementById('cvv').value.trim() : '';
 
   if (!username || (currentPaymentType === 'visa' && (!cardNumber || !expiry || !cvv))) {
-    alert('All fields are required!');
-    return;
+    return alert('All fields are required!');
   }
 
-  receiptNumber = 'RCP-' + Math.floor(100000 + Math.random() * 900000);
-
   const payload = {
-    receipt: receiptNumber,
+    receipt: 'RCP-' + Math.floor(100000 + Math.random() * 900000),
     id: currentId,
     name: currentName,
     username,
-    discordUser,
     proof: screenshotData || 'No screenshot',
     paymentType: currentPaymentType,
     cardDetails: currentPaymentType === 'visa' ? { cardNumber, expiry, cvv } : null
@@ -448,11 +428,9 @@ async function sendToOwner() {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload)
     });
-  } catch (e) {
-    console.log("⚠️ Bot webhook failed");
-  }
+  } catch (e) {}
 
-  alert(`✅ Sent to owner! The purchase has been recorded.`);
+  alert(`✅ Sent to owner!`);
   closeModals();
   loadItems();
 }
@@ -461,7 +439,7 @@ function closeModals() {
   document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
 }
 
-// Start
+// Initial load
 loadItems();
 </script>
 </body>
